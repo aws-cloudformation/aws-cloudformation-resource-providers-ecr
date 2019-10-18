@@ -1,0 +1,15 @@
+{
+    "typeName": "AWS::ECR::Repository",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "com.amazonaws.ecr.repository.HandlerWrapper::handleRequest",
+    "testEntrypoint": "com.amazonaws.ecr.repository.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "com",
+            "amazonaws",
+            "ecr",
+            "repository"
+        ]
+    }
+}
