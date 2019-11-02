@@ -21,7 +21,7 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
         final String repositoryName = model.getRepositoryName();
 
         try {
-            proxy.injectCredentialsAndInvokeV2(Helpers.deleteRepositoryRequest(model), ClientBuilder.getClient()::deleteRepository);
+            proxy.injectCredentialsAndInvokeV2(Translator.deleteRepositoryRequest(model), ClientBuilder.getClient()::deleteRepository);
             logger.log(String.format("%s [%s] Deleted Successfully", ResourceModel.TYPE_NAME, repositoryName));
         } catch (RepositoryNotFoundException e) {
             throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, repositoryName);

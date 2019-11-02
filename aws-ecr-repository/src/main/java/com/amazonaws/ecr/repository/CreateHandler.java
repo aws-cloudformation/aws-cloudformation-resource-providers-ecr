@@ -38,14 +38,14 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         try {
-            proxy.injectCredentialsAndInvokeV2(Helpers.createRepositoryRequest(model), client::createRepository);
+            proxy.injectCredentialsAndInvokeV2(Translator.createRepositoryRequest(model), client::createRepository);
             logger.log(String.format("%s [%s] Created Successfully", ResourceModel.TYPE_NAME, model.getRepositoryName()));
         } catch (RepositoryAlreadyExistsException e) {
             throw new ResourceAlreadyExistsException(ResourceModel.TYPE_NAME, model.getRepositoryName());
         }
 
-        if (model.getLifecyclePolicy() != null) proxy.injectCredentialsAndInvokeV2(Helpers.putLifecyclePolicyRequest(model), client::putLifecyclePolicy);
-        if (model.getRepositoryPolicyText() != null) proxy.injectCredentialsAndInvokeV2(Helpers.setRepositoryPolicyRequest(model), client::setRepositoryPolicy);
+        if (model.getLifecyclePolicy() != null) proxy.injectCredentialsAndInvokeV2(Translator.putLifecyclePolicyRequest(model), client::putLifecyclePolicy);
+        if (model.getRepositoryPolicyText() != null) proxy.injectCredentialsAndInvokeV2(Translator.setRepositoryPolicyRequest(model), client::setRepositoryPolicy);
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
                 .resourceModel(model)

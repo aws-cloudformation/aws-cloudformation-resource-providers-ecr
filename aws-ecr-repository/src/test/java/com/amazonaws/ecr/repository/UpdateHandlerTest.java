@@ -8,8 +8,8 @@ import com.amazonaws.cloudformation.proxy.ProgressEvent;
 import com.amazonaws.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +51,7 @@ public class UpdateHandlerTest {
 
     private UpdateHandler handler;
 
-    private List<Tags> tags = Collections.singletonList(Tags.builder().key("newKey").value("newVal").build());
+    private Set<Tags> tags = Collections.singleton(Tags.builder().key("newKey").value("newVal").build());
 
     private Repository repo = Repository.builder()
             .repositoryName("repo")

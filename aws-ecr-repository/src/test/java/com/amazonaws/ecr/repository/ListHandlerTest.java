@@ -7,8 +7,8 @@ import com.amazonaws.cloudformation.proxy.ProgressEvent;
 import com.amazonaws.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,7 +83,7 @@ public class ListHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        final List<Tags> tags = Collections.singletonList(Tags.builder().key("key").value("value").build());
+        final Set<Tags> tags = Collections.singleton(Tags.builder().key("key").value("value").build());
 
         final Map<String, Object> policyObject = new HashMap<>();
         policyObject.put("foo", "bar");

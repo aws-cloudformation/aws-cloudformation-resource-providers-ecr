@@ -11,8 +11,7 @@
                     "type": "string",
                     "description": "The JSON repository policy text to apply to the repository.",
                     "minLength": 100,
-                    "maxLength": 30720,
-                    "pattern": "^.{100,30720}\\Z"
+                    "maxLength": 30720
                 },
                 "RegistryId": {
                     "type": "string",
@@ -27,7 +26,7 @@
             "description": "The name to use for the repository. The repository name may be specified on its own (such as nginx-web-app) or it can be prepended with a namespace to group the repository into a category (such as project-a/nginx-web-app). If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the repository name. For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-name.html.",
             "minLength": 2,
             "maxLength": 256,
-            "pattern": "^(?=.{2,256}$)((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)\\Z"
+            "pattern": "^(?=.{2,256}\\Z)((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)\\Z"
         },
         "RepositoryPolicyText": {
             "type": "object",
@@ -35,6 +34,8 @@
         },
         "Tags": {
             "type": "array",
+            "uniqueItems": true,
+            "insertionOrder": false,
             "description": "An array of key-value pairs to apply to this resource.",
             "items": {
                 "type": "object",
@@ -55,7 +56,8 @@
                 "required": [
                     "Value",
                     "Key"
-                ]
+                ],
+                "maxItems": 50
             }
         }
     },
@@ -71,8 +73,7 @@
                 "ecr:CreateRepository",
                 "ecr:PutLifecyclePolicy",
                 "ecr:SetRepositoryPolicy",
-                "ecr:TagResource",
-                "ecr:UntagResource"
+                "ecr:TagResource"
             ]
         },
         "read": {
