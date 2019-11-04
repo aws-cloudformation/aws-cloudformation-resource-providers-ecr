@@ -89,6 +89,7 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                 .lifecyclePolicy(lifecyclePolicy)
                 .repositoryPolicyText(repositoryPolicyText)
                 .tags(tags)
+                .arn(arn)
                 .build();
     }
 }

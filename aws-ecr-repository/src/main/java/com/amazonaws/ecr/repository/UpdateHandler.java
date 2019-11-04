@@ -58,6 +58,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
 
             final DescribeRepositoriesResponse describeResponse = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), client::describeRepositories);
             final String arn = describeResponse.repositories().get(0).repositoryArn();
+            model.setArn(arn);
             handleTagging(model.getTags(), arn);
         } catch (RepositoryNotFoundException e) {
             throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());

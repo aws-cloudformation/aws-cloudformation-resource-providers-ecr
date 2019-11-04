@@ -15,11 +15,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.amazonaws.cloudformation.exceptions.ResourceAlreadyExistsException;
+import software.amazon.awssdk.services.ecr.model.CreateRepositoryRequest;
+import software.amazon.awssdk.services.ecr.model.CreateRepositoryResponse;
+import software.amazon.awssdk.services.ecr.model.Repository;
 import software.amazon.awssdk.services.ecr.model.RepositoryAlreadyExistsException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +36,16 @@ public class CreateHandlerTest {
     private Logger logger;
 
     private CreateHandler handler;
+
+    private Repository repo = Repository.builder()
+            .repositoryName("repo")
+            .registryId("id")
+            .repositoryArn("arn")
+            .build();
+
+    private CreateRepositoryResponse createRepositoryResponse = CreateRepositoryResponse.builder()
+            .repository(repo)
+            .build();
 
     @BeforeEach
     public void setup() {
@@ -61,6 +75,10 @@ public class CreateHandlerTest {
             .desiredResourceState(model)
             .build();
 
+        doReturn(createRepositoryResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(CreateRepositoryRequest.class), any());
+
         final ProgressEvent<ResourceModel, CallbackContext> response
             = handler.handleRequest(proxy, request, null, logger);
 
@@ -84,6 +102,10 @@ public class CreateHandlerTest {
                 .clientRequestToken("token")
                 .desiredResourceState(model)
                 .build();
+
+        doReturn(createRepositoryResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(CreateRepositoryRequest.class), any());
 
         final ProgressEvent<ResourceModel, CallbackContext> response
                 = handler.handleRequest(proxy, request, null, logger);

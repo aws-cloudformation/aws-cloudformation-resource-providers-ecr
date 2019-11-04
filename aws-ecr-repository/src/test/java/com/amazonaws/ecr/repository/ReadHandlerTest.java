@@ -105,6 +105,7 @@ public class ReadHandlerTest {
                         .registryId("id")
                         .build())
                 .tags(tags)
+                .arn("arn")
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
@@ -152,6 +153,7 @@ public class ReadHandlerTest {
                 .repositoryPolicyText(null)
                 .lifecyclePolicy(null)
                 .tags(tags)
+                .arn("arn")
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =

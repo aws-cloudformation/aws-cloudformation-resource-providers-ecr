@@ -8,6 +8,7 @@ import com.amazonaws.cloudformation.proxy.ResourceHandlerRequest;
 import com.amazonaws.cloudformation.resource.IdentifierUtils;
 import com.amazonaws.util.StringUtils;
 import com.amazonaws.cloudformation.exceptions.ResourceAlreadyExistsException;
+import software.amazon.awssdk.services.ecr.model.CreateRepositoryResponse;
 import software.amazon.awssdk.services.ecr.model.RepositoryAlreadyExistsException;
 import software.amazon.awssdk.services.ecr.EcrClient;
 
@@ -38,7 +39,8 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         try {
-            proxy.injectCredentialsAndInvokeV2(Translator.createRepositoryRequest(model), client::createRepository);
+            final CreateRepositoryResponse response = proxy.injectCredentialsAndInvokeV2(Translator.createRepositoryRequest(model), client::createRepository);
+            model.setArn(response.repository().repositoryArn());
             logger.log(String.format("%s [%s] Created Successfully", ResourceModel.TYPE_NAME, model.getRepositoryName()));
         } catch (RepositoryAlreadyExistsException e) {
             throw new ResourceAlreadyExistsException(ResourceModel.TYPE_NAME, model.getRepositoryName());

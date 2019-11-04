@@ -71,10 +71,16 @@
             "items": {
                 "$ref": "#/definitions/Tag"
             }
+        },
+        "Arn": {
+            "type": "string"
         }
     },
     "createOnlyProperties": [
         "/properties/RepositoryName"
+    ],
+    "readOnlyProperties": [
+        "/properties/Arn"
     ],
     "primaryIdentifier": [
         "/properties/RepositoryName"

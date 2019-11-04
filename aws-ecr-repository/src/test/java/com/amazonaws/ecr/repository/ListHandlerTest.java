@@ -96,6 +96,7 @@ public class ListHandlerTest {
                         .registryId("id")
                         .build())
                 .tags(tags)
+                .arn("arn")
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
