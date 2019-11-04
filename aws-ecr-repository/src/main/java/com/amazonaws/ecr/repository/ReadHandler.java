@@ -82,7 +82,7 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
         }
 
         final ListTagsForResourceResponse listTagsResponse = proxy.injectCredentialsAndInvokeV2(Translator.listTagsForResourceRequest(arn), client::listTagsForResource);
-        final Set<Tags> tags = Translator.translateTagsFromSdk(listTagsResponse.tags());
+        final Set<Tag> tags = Translator.translateTagsFromSdk(listTagsResponse.tags());
 
         return ResourceModel.builder()
                 .repositoryName(repositoryName)

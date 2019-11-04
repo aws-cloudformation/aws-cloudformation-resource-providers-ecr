@@ -30,7 +30,6 @@ import software.amazon.awssdk.services.ecr.model.Repository;
 import software.amazon.awssdk.services.ecr.model.RepositoryNotFoundException;
 import software.amazon.awssdk.services.ecr.model.RepositoryPolicyNotFoundException;
 import software.amazon.awssdk.services.ecr.model.SetRepositoryPolicyResponse;
-import software.amazon.awssdk.services.ecr.model.Tag;
 import software.amazon.awssdk.services.ecr.model.TagResourceResponse;
 import software.amazon.awssdk.services.ecr.model.UntagResourceResponse;
 
@@ -51,7 +50,7 @@ public class UpdateHandlerTest {
 
     private UpdateHandler handler;
 
-    private Set<Tags> tags = Collections.singleton(Tags.builder().key("newKey").value("newVal").build());
+    private Set<Tag> tags = Collections.singleton(Tag.builder().key("newKey").value("newVal").build());
 
     private Repository repo = Repository.builder()
             .repositoryName("repo")
@@ -79,7 +78,7 @@ public class UpdateHandlerTest {
         final UntagResourceResponse untagResourceResponse = UntagResourceResponse.builder().build();
         final TagResourceResponse tagResourceResponse = TagResourceResponse.builder().build();
         final ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
-                .tags(Collections.singletonList(Tag.builder().key("key").value("val").build()))
+                .tags(Collections.singletonList(software.amazon.awssdk.services.ecr.model.Tag.builder().key("key").value("val").build()))
                 .build();
 
         doReturn(setRepositoryPolicyResponse,

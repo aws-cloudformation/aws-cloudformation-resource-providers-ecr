@@ -69,7 +69,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
                 .build();
     }
 
-    private void handleTagging(final Set<Tags> tags, final String arn) {
+    private void handleTagging(final Set<com.amazonaws.ecr.repository.Tag> tags, final String arn) {
         final Set<Tag> newTags = tags == null ? Collections.emptySet() : new HashSet<>(Translator.translateTagsToSdk(tags));
         final Set<Tag> existingTags = new HashSet<>(proxy.injectCredentialsAndInvokeV2(Translator.listTagsForResourceRequest(arn), client::listTagsForResource).tags());
 

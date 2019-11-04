@@ -48,7 +48,7 @@ public class CreateHandlerTest {
         final Map<String, Object> repositoryPolicy = new HashMap<>();
         repositoryPolicy.put("foo", "bar");
 
-        final Set<Tags> tags = Collections.singleton(Tags.builder().key("key").value("value").build());
+        final Set<Tag> tags = Collections.singleton(Tag.builder().key("key").value("value").build());
 
         final ResourceModel model = ResourceModel.builder()
                 .repositoryName("repo")

@@ -94,7 +94,7 @@ public class Translator {
                 .build();
     }
 
-    static List<Tag> translateTagsToSdk(final Set<Tags> tags) {
+    static List<Tag> translateTagsToSdk(final Set<com.amazonaws.ecr.repository.Tag> tags) {
         if (tags == null) return null;
         return tags.stream().map(tag -> Tag.builder()
                 .key(tag.getKey())
@@ -103,14 +103,15 @@ public class Translator {
         ).collect(Collectors.toList());
     }
 
-    static Set<Tags> translateTagsFromSdk(final List<Tag> tags) {
+    static Set<com.amazonaws.ecr.repository.Tag> translateTagsFromSdk(final List<Tag> tags) {
         if (tags == null) return null;
-        return tags.stream().map(tag -> Tags.builder()
+        return tags.stream().map(tag -> com.amazonaws.ecr.repository.Tag.builder()
                 .key(tag.key())
                 .value(tag.value())
                 .build()
         ).collect(Collectors.toSet());
     }
+
     static GetRepositoryPolicyRequest getRepositoryPolicyRequest(final String repositoryName, final String registryId) {
         return GetRepositoryPolicyRequest.builder()
                 .repositoryName(repositoryName)

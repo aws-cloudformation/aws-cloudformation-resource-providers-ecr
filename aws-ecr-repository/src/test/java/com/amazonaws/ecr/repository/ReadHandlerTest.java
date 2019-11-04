@@ -28,7 +28,6 @@ import software.amazon.awssdk.services.ecr.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.ecr.model.Repository;
 import software.amazon.awssdk.services.ecr.model.RepositoryNotFoundException;
 import software.amazon.awssdk.services.ecr.model.RepositoryPolicyNotFoundException;
-import software.amazon.awssdk.services.ecr.model.Tag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -70,7 +69,7 @@ public class ReadHandlerTest {
             .build();
 
     private ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
-            .tags(Collections.singletonList(Tag.builder().key("key").value("value").build()))
+            .tags(Collections.singletonList(software.amazon.awssdk.services.ecr.model.Tag.builder().key("key").value("value").build()))
             .build();
 
     @BeforeEach
@@ -93,7 +92,7 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        final Set<Tags> tags = Collections.singleton(Tags.builder().key("key").value("value").build());
+        final Set<Tag> tags = Collections.singleton(Tag.builder().key("key").value("value").build());
 
         final Map<String, Object> policyObject = new HashMap<>();
         policyObject.put("foo", "bar");
@@ -146,7 +145,7 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        final Set<Tags> tags = Collections.singleton(Tags.builder().key("key").value("value").build());
+        final Set<com.amazonaws.ecr.repository.Tag> tags = Collections.singleton(com.amazonaws.ecr.repository.Tag.builder().key("key").value("value").build());
 
         final ResourceModel expectedModel = ResourceModel.builder()
                 .repositoryName("repo")

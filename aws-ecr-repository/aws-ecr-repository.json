@@ -2,22 +2,53 @@
     "typeName": "AWS::ECR::Repository",
     "description": "The AWS::ECR::Repository resource specifies an Amazon Elastic Container Registry (Amazon ECR) repository, where users can push and pull Docker images. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/Repositories.html",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ecr.git",
+    "definitions": {
+        "LifecyclePolicyText": {
+            "type": "string",
+            "description": "The JSON repository policy text to apply to the repository.",
+            "minLength": 100,
+            "maxLength": 30720
+        },
+        "RegistryId": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 12,
+            "pattern": "^[0-9]{12}\\Z"
+        },
+        "Tag": {
+            "description": "An arbitrary set of tags (key-value pairs) for this trail.",
+            "type": "object",
+            "properties": {
+                "Key": {
+                    "type": "string",
+                    "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+                    "minLength": 1,
+                    "maxLength": 127
+                },
+                "Value": {
+                    "type": "string",
+                    "description": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+                    "minLength": 1,
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "Value",
+                "Key"
+            ],
+            "maxItems": 50
+        }
+    },
     "properties": {
         "LifecyclePolicy": {
             "type": "object",
             "description": "The LifecyclePolicy property type specifies a lifecycle policy. For information about lifecycle policy syntax, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html",
             "properties": {
                 "LifecyclePolicyText": {
-                    "type": "string",
-                    "description": "The JSON repository policy text to apply to the repository.",
-                    "minLength": 100,
-                    "maxLength": 30720
+                    "$ref": "#/definitions/LifecyclePolicyText"
                 },
                 "RegistryId": {
-                    "type": "string",
-                    "minLength": 12,
-                    "maxLength": 12,
-                    "pattern": "^[0-9]{12}\\Z"
+                    "$ref": "#/definitions/RegistryId"
                 }
             }
         },
@@ -38,26 +69,7 @@
             "insertionOrder": false,
             "description": "An array of key-value pairs to apply to this resource.",
             "items": {
-                "type": "object",
-                "properties": {
-                    "Key": {
-                        "type": "string",
-                        "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
-                        "minLength": 1,
-                        "maxLength": 127
-                    },
-                    "Value": {
-                        "type": "string",
-                        "description": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
-                        "minLength": 1,
-                        "maxLength": 255
-                    }
-                },
-                "required": [
-                    "Value",
-                    "Key"
-                ],
-                "maxItems": 50
+                "$ref": "#/definitions/Tag"
             }
         }
     },

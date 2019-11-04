@@ -83,7 +83,7 @@ public class ListHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        final Set<Tags> tags = Collections.singleton(Tags.builder().key("key").value("value").build());
+        final Set<com.amazonaws.ecr.repository.Tag> tags = Collections.singleton(com.amazonaws.ecr.repository.Tag.builder().key("key").value("value").build());
 
         final Map<String, Object> policyObject = new HashMap<>();
         policyObject.put("foo", "bar");
