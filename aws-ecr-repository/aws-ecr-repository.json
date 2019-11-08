@@ -36,8 +36,7 @@
             "required": [
                 "Value",
                 "Key"
-            ],
-            "maxItems": 50
+            ]
         }
     },
     "properties": {
@@ -66,6 +65,7 @@
         },
         "Tags": {
             "type": "array",
+            "maxItems": 50,
             "uniqueItems": true,
             "insertionOrder": false,
             "description": "An array of key-value pairs to apply to this resource.",
