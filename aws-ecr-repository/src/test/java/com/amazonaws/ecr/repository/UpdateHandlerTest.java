@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +52,8 @@ public class UpdateHandlerTest {
     private UpdateHandler handler;
 
     private Set<Tag> tags = Collections.singleton(Tag.builder().key("newKey").value("newVal").build());
+
+    private Map<String, String> tagsMap = tags.stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
 
     private Repository repo = Repository.builder()
             .repositoryName("repo")
@@ -105,8 +108,9 @@ public class UpdateHandlerTest {
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(tagsMap)
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response
             = handler.handleRequest(proxy, request, null, logger);

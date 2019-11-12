@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +48,8 @@ public class CreateHandlerTest {
             .repository(repo)
             .build();
 
+    HandlerWrapper handlerWrapper = new HandlerWrapper();
+
     @BeforeEach
     public void setup() {
         handler = new CreateHandler();
@@ -63,6 +66,7 @@ public class CreateHandlerTest {
         repositoryPolicy.put("foo", "bar");
 
         final Set<Tag> tags = Collections.singleton(Tag.builder().key("key").value("value").build());
+        final Map<String, String> tagsMap = tags.stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
 
         final ResourceModel model = ResourceModel.builder()
                 .repositoryName("repo")
@@ -72,8 +76,9 @@ public class CreateHandlerTest {
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(tagsMap)
+                .build();
 
         doReturn(createRepositoryResponse)
                 .when(proxy)

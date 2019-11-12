@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import software.amazon.awssdk.services.ecr.model.CreateRepositoryRequest;
@@ -25,10 +26,10 @@ import software.amazon.awssdk.services.ecr.model.UntagResourceRequest;
 public class Translator {
     public static final ObjectMapper MAPPER = new ObjectMapper();
 
-    static CreateRepositoryRequest createRepositoryRequest(final ResourceModel model) {
+    static CreateRepositoryRequest createRepositoryRequest(final ResourceModel model, final Map<String, String> tags) {
         return CreateRepositoryRequest.builder()
                 .repositoryName(model.getRepositoryName())
-                .tags(translateTagsToSdk(model.getTags()))
+                .tags(translateTagsToSdk(tags))
                 .build();
     }
 
@@ -94,12 +95,12 @@ public class Translator {
                 .build();
     }
 
-    static List<Tag> translateTagsToSdk(final Set<com.amazonaws.ecr.repository.Tag> tags) {
+    static List<Tag> translateTagsToSdk(final Map<String, String> tags) {
         if (tags == null) return null;
-        return tags.stream().map(tag -> Tag.builder()
-                .key(tag.getKey())
-                .value(tag.getValue())
-                .build()
+        return tags.keySet().stream().map(key -> Tag.builder()
+            .key(key)
+            .value(tags.get(key))
+            .build()
         ).collect(Collectors.toList());
     }
 

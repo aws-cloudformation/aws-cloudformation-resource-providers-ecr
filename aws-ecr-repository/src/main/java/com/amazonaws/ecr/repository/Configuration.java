@@ -1,6 +1,7 @@
 package com.amazonaws.ecr.repository;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -19,6 +20,6 @@ class Configuration extends BaseConfiguration {
      * @return
      */
     public Map<String, String> resourceDefinedTags(final ResourceModel resourceModel) {
-        return null;
+        return resourceModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
     }
 }

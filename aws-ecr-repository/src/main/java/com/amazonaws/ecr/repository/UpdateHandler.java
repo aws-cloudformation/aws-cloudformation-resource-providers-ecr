@@ -9,6 +9,7 @@ import com.amazonaws.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import software.amazon.awssdk.services.ecr.EcrClient;
@@ -59,18 +60,19 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             final DescribeRepositoriesResponse describeResponse = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), client::describeRepositories);
             final String arn = describeResponse.repositories().get(0).repositoryArn();
             model.setArn(arn);
-            handleTagging(model.getTags(), arn);
+            handleTagging(request.getDesiredResourceTags(), arn);
         } catch (RepositoryNotFoundException e) {
             throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());
         }
 
+        logger.log(String.format("UPDATE %s", model));
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
                 .resourceModel(model)
                 .status(OperationStatus.SUCCESS)
                 .build();
     }
 
-    private void handleTagging(final Set<com.amazonaws.ecr.repository.Tag> tags, final String arn) {
+    private void handleTagging(final Map<String, String> tags, final String arn) {
         final Set<Tag> newTags = tags == null ? Collections.emptySet() : new HashSet<>(Translator.translateTagsToSdk(tags));
         final Set<Tag> existingTags = new HashSet<>(proxy.injectCredentialsAndInvokeV2(Translator.listTagsForResourceRequest(arn), client::listTagsForResource).tags());
 
