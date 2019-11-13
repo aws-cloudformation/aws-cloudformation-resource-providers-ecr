@@ -20,6 +20,10 @@ class Configuration extends BaseConfiguration {
      * @return
      */
     public Map<String, String> resourceDefinedTags(final ResourceModel resourceModel) {
-        return resourceModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
+        if (resourceModel.getTags() == null) {
+            return null;
+        } else {
+            return resourceModel.getTags().stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
+        }
     }
 }

@@ -48,8 +48,6 @@ public class CreateHandlerTest {
             .repository(repo)
             .build();
 
-    HandlerWrapper handlerWrapper = new HandlerWrapper();
-
     @BeforeEach
     public void setup() {
         handler = new CreateHandler();

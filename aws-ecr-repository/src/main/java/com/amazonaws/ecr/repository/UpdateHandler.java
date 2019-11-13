@@ -65,7 +65,6 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());
         }
 
-        logger.log(String.format("UPDATE %s", model));
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
                 .resourceModel(model)
                 .status(OperationStatus.SUCCESS)

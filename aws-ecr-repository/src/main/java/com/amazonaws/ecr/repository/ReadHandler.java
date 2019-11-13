@@ -36,16 +36,12 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
 
         try {
             response = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), ClientBuilder.getClient()::describeRepositories);
-            logger.log("READ success");
         } catch (RepositoryNotFoundException e) {
-            logger.log("READ RepositoryNotFoundException");
             throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());
         }
 
-        ResourceModel modelToReturn = buildModel(proxy, response.repositories().get(0));
-        logger.log(String.format("READ %s", modelToReturn.getArn()));
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
-                .resourceModel(modelToReturn)
+                .resourceModel(buildModel(proxy, response.repositories().get(0)))
                 .status(OperationStatus.SUCCESS)
                 .build();
     }
