@@ -185,4 +185,50 @@ public class ReadHandlerTest {
         assertThrows(ResourceNotFoundException.class,
                 () -> handler.handleRequest(proxy, request, null, logger));
     }
+
+    @Test
+    public void handleRequest_NullRepositoryPolicyText() {
+        final GetRepositoryPolicyResponse getRepositoryPolicyResponse = GetRepositoryPolicyResponse.builder()
+                .repositoryName("repo")
+                .registryId("id")
+                .build();
+
+        doReturn(describeRepositoriesResponse,
+                getRepositoryPolicyResponse,
+                getLifecyclePolicyResponse,
+                listTagsForResourceResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(), any());
+
+        final ResourceModel model = ResourceModel.builder().build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        final Set<Tag> tags = Collections.singleton(Tag.builder().key("key").value("value").build());
+
+        final ResourceModel expectedModel = ResourceModel.builder()
+                .repositoryName("repo")
+                .lifecyclePolicy(LifecyclePolicy.builder()
+                        .lifecyclePolicyText("policy")
+                        .registryId("id")
+                        .build())
+                .tags(tags)
+                .arn("arn")
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                handler.handleRequest(proxy, request, null, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(expectedModel);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+        assertThat(response.getNextToken()).isNull();
+    }
 }
