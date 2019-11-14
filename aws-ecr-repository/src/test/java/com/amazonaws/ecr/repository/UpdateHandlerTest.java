@@ -6,8 +6,11 @@ import com.amazonaws.cloudformation.proxy.Logger;
 import com.amazonaws.cloudformation.proxy.OperationStatus;
 import com.amazonaws.cloudformation.proxy.ProgressEvent;
 import com.amazonaws.cloudformation.proxy.ResourceHandlerRequest;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,9 +54,6 @@ public class UpdateHandlerTest {
 
     private UpdateHandler handler;
 
-    private Set<Tag> tags = Collections.singleton(Tag.builder().key("newKey").value("newVal").build());
-
-    private Map<String, String> tagsMap = tags.stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
 
     private Repository repo = Repository.builder()
             .repositoryName("repo")
@@ -80,8 +80,18 @@ public class UpdateHandlerTest {
         final PutLifecyclePolicyResponse putLifecyclePolicyResponse = PutLifecyclePolicyResponse.builder().build();
         final UntagResourceResponse untagResourceResponse = UntagResourceResponse.builder().build();
         final TagResourceResponse tagResourceResponse = TagResourceResponse.builder().build();
+        final List<software.amazon.awssdk.services.ecr.model.Tag> existingTags = ImmutableList.of(
+                software.amazon.awssdk.services.ecr.model.Tag.builder().key("key1").value("val1").build(),
+                software.amazon.awssdk.services.ecr.model.Tag.builder().key("key2").value("val2").build()
+        );
+        final Set<Tag> newTags = ImmutableSet.of(
+                Tag.builder().key("key1").value("val1").build(),
+                Tag.builder().key("key2updated").value("val2").build()
+        );
+        final Map<String, String> newTagsMap = newTags.stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
+
         final ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
-                .tags(Collections.singletonList(software.amazon.awssdk.services.ecr.model.Tag.builder().key("key").value("val").build()))
+                .tags(existingTags)
                 .build();
 
         doReturn(setRepositoryPolicyResponse,
@@ -104,12 +114,12 @@ public class UpdateHandlerTest {
                 .repositoryName("repo")
                 .lifecyclePolicy(lifecyclePolicy)
                 .repositoryPolicyText(repositoryPolicy)
-                .tags(tags)
+                .tags(newTags)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(tagsMap)
+                .desiredResourceTags(newTagsMap)
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response

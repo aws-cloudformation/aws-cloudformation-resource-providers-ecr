@@ -22,6 +22,7 @@ import software.amazon.awssdk.services.ecr.model.SetRepositoryPolicyRequest;
 import software.amazon.awssdk.services.ecr.model.Tag;
 import software.amazon.awssdk.services.ecr.model.TagResourceRequest;
 import software.amazon.awssdk.services.ecr.model.UntagResourceRequest;
+import software.amazon.awssdk.utils.CollectionUtils;
 
 public class Translator {
     public static final ObjectMapper MAPPER = new ObjectMapper();
@@ -98,14 +99,14 @@ public class Translator {
     static List<Tag> translateTagsToSdk(final Map<String, String> tags) {
         if (tags == null) return null;
         return tags.keySet().stream().map(key -> Tag.builder()
-            .key(key)
-            .value(tags.get(key))
-            .build()
+                .key(key)
+                .value(tags.get(key))
+                .build()
         ).collect(Collectors.toList());
     }
 
     static Set<com.amazonaws.ecr.repository.Tag> translateTagsFromSdk(final List<Tag> tags) {
-        if (tags == null) return null;
+        if (CollectionUtils.isNullOrEmpty(tags)) return null;
         return tags.stream().map(tag -> com.amazonaws.ecr.repository.Tag.builder()
                 .key(tag.key())
                 .value(tag.value())
