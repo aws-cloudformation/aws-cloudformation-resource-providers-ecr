@@ -1,4 +1,4 @@
-package com.amazonaws.ecr.repository;
+package software.amazon.ecr.repository;
 
 import lombok.Builder;
 import lombok.Data;

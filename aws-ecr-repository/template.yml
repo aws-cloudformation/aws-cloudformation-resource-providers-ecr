@@ -10,13 +10,13 @@ Resources:
   TypeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: com.amazonaws.ecr.repository.HandlerWrapper::handleRequest
+      Handler: software.amazon.ecr.repository.HandlerWrapper::handleRequest
       Runtime: java8
       CodeUri: ./target/aws-ecr-repository-handler-1.0-SNAPSHOT.jar
 
   TestEntrypoint:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: com.amazonaws.ecr.repository.HandlerWrapper::testEntrypoint
+      Handler: software.amazon.ecr.repository.HandlerWrapper::testEntrypoint
       Runtime: java8
       CodeUri: ./target/aws-ecr-repository-handler-1.0-SNAPSHOT.jar
