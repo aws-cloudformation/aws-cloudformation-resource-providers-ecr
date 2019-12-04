@@ -1,10 +1,10 @@
-package com.amazonaws.ecr.repository;
+package software.amazon.ecr.repository;
 
-import com.amazonaws.cloudformation.proxy.AmazonWebServicesClientProxy;
-import com.amazonaws.cloudformation.proxy.Logger;
-import com.amazonaws.cloudformation.proxy.OperationStatus;
-import com.amazonaws.cloudformation.proxy.ProgressEvent;
-import com.amazonaws.cloudformation.proxy.ResourceHandlerRequest;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +83,7 @@ public class ListHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        final Set<com.amazonaws.ecr.repository.Tag> tags = Collections.singleton(com.amazonaws.ecr.repository.Tag.builder().key("key").value("value").build());
+        final Set<software.amazon.ecr.repository.Tag> tags = Collections.singleton(software.amazon.ecr.repository.Tag.builder().key("key").value("value").build());
 
         final Map<String, Object> policyObject = new HashMap<>();
         policyObject.put("foo", "bar");

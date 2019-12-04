@@ -1,4 +1,4 @@
-package com.amazonaws.ecr.repository;
+package software.amazon.ecr.repository;
 
 import java.util.Map;
 import java.util.stream.Collectors;

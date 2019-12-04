@@ -1,11 +1,11 @@
-package com.amazonaws.ecr.repository;
+package software.amazon.ecr.repository;
 
-import com.amazonaws.cloudformation.proxy.AmazonWebServicesClientProxy;
-import com.amazonaws.cloudformation.proxy.Logger;
-import com.amazonaws.cloudformation.proxy.ProgressEvent;
-import com.amazonaws.cloudformation.proxy.OperationStatus;
-import com.amazonaws.cloudformation.proxy.ResourceHandlerRequest;
-import com.amazonaws.cloudformation.exceptions.ResourceNotFoundException;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.awssdk.services.ecr.model.RepositoryNotFoundException;
 
 public class DeleteHandler extends BaseHandler<CallbackContext> {

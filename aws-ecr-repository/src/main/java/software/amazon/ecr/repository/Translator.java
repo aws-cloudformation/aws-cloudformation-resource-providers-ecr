@@ -1,6 +1,6 @@
-package com.amazonaws.ecr.repository;
+package software.amazon.ecr.repository;
 
-import com.amazonaws.cloudformation.exceptions.TerminalException;
+import software.amazon.cloudformation.exceptions.TerminalException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
@@ -105,9 +105,9 @@ public class Translator {
         ).collect(Collectors.toList());
     }
 
-    static Set<com.amazonaws.ecr.repository.Tag> translateTagsFromSdk(final List<Tag> tags) {
+    static Set<software.amazon.ecr.repository.Tag> translateTagsFromSdk(final List<Tag> tags) {
         if (CollectionUtils.isNullOrEmpty(tags)) return null;
-        return tags.stream().map(tag -> com.amazonaws.ecr.repository.Tag.builder()
+        return tags.stream().map(tag -> software.amazon.ecr.repository.Tag.builder()
                 .key(tag.key())
                 .value(tag.value())
                 .build()
