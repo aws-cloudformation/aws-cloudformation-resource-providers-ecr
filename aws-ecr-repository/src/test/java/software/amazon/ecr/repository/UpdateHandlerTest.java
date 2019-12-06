@@ -1,5 +1,11 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
+import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesResponse;
+import software.amazon.awssdk.services.ecr.model.EcrException;
+import software.amazon.awssdk.services.ecr.model.Repository;
+import software.amazon.awssdk.services.ecr.model.UntagResourceRequest;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -24,13 +30,10 @@ import software.amazon.awssdk.services.ecr.model.DeleteLifecyclePolicyRequest;
 import software.amazon.awssdk.services.ecr.model.DeleteLifecyclePolicyResponse;
 import software.amazon.awssdk.services.ecr.model.DeleteRepositoryPolicyRequest;
 import software.amazon.awssdk.services.ecr.model.DeleteRepositoryPolicyResponse;
-import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
-import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesResponse;
 import software.amazon.awssdk.services.ecr.model.LifecyclePolicyNotFoundException;
 import software.amazon.awssdk.services.ecr.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.ecr.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.ecr.model.PutLifecyclePolicyResponse;
-import software.amazon.awssdk.services.ecr.model.Repository;
 import software.amazon.awssdk.services.ecr.model.RepositoryNotFoundException;
 import software.amazon.awssdk.services.ecr.model.RepositoryPolicyNotFoundException;
 import software.amazon.awssdk.services.ecr.model.SetRepositoryPolicyResponse;
@@ -69,6 +72,16 @@ public class UpdateHandlerTest {
             .tags(Collections.emptyList())
             .build();
 
+    private List<software.amazon.awssdk.services.ecr.model.Tag> existingTags = ImmutableList.of(
+            software.amazon.awssdk.services.ecr.model.Tag.builder().key("key1").value("val1").build(),
+            software.amazon.awssdk.services.ecr.model.Tag.builder().key("key2").value("val2").build()
+    );
+    private Set<Tag> newTags = ImmutableSet.of(
+            Tag.builder().key("key1").value("val1").build(),
+            Tag.builder().key("key2updated").value("val2").build()
+    );
+    private Map<String, String> newTagsMap = newTags.stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
+
     @BeforeEach
     public void setup() {
         handler = new UpdateHandler();
@@ -80,16 +93,6 @@ public class UpdateHandlerTest {
         final PutLifecyclePolicyResponse putLifecyclePolicyResponse = PutLifecyclePolicyResponse.builder().build();
         final UntagResourceResponse untagResourceResponse = UntagResourceResponse.builder().build();
         final TagResourceResponse tagResourceResponse = TagResourceResponse.builder().build();
-        final List<software.amazon.awssdk.services.ecr.model.Tag> existingTags = ImmutableList.of(
-                software.amazon.awssdk.services.ecr.model.Tag.builder().key("key1").value("val1").build(),
-                software.amazon.awssdk.services.ecr.model.Tag.builder().key("key2").value("val2").build()
-        );
-        final Set<Tag> newTags = ImmutableSet.of(
-                Tag.builder().key("key1").value("val1").build(),
-                Tag.builder().key("key2updated").value("val2").build()
-        );
-        final Map<String, String> newTagsMap = newTags.stream().collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue()));
-
         final ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
                 .tags(existingTags)
                 .build();
@@ -219,6 +222,88 @@ public class UpdateHandlerTest {
                 .build();
 
         assertThrows(ResourceNotFoundException.class,
+                () -> handler.handleRequest(proxy, request, null, logger));
+    }
+
+    @Test
+    public void handleRequest_StackTagsPermissionError() {
+        doThrow(EcrException.builder().message("not authorized to perform: ecr:TagResource").build(),
+                EcrException.builder().message("not authorized to perform: ecr:UntagResource").build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(), any());
+
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, null, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handleRequest_ResourceTagsPermissionError() {
+        final ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
+                .tags(existingTags)
+                .build();
+
+        doThrow(RepositoryPolicyNotFoundException.class)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DeleteRepositoryPolicyRequest.class), any());
+        doThrow(LifecyclePolicyNotFoundException.class)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DeleteLifecyclePolicyRequest.class), any());
+        doReturn(describeRepositoriesResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeRepositoriesRequest.class), any());
+        doReturn(listTagsForResourceResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
+        doThrow(EcrException.builder().message("not authorized to perform: ecr:UntagResource").build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(UntagResourceRequest.class), any());
+
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .tags(newTags)
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .desiredResourceTags(newTagsMap)
+                .build();
+
+        assertThrows(CfnGeneralServiceException.class,
+                () -> handler.handleRequest(proxy, request, null, logger));
+    }
+
+    @Test
+    public void handleRequest_EcrException() {
+        doThrow(EcrException.builder().message("general exception").build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(), any());
+
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        assertThrows(CfnGeneralServiceException.class,
                 () -> handler.handleRequest(proxy, request, null, logger));
     }
 }

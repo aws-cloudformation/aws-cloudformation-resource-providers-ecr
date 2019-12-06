@@ -1,5 +1,8 @@
 package software.amazon.ecr.repository;
 
+import com.google.common.collect.ImmutableSet;
+import software.amazon.awssdk.services.ecr.model.EcrException;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -139,6 +142,72 @@ public class CreateHandlerTest {
                 .build();
 
         assertThrows(ResourceAlreadyExistsException.class,
+                () -> handler.handleRequest(proxy, request, null, logger));
+    }
+
+    @Test
+    public void handleRequest_StackTagsPermissionError() {
+        doThrow(EcrException.builder().message("not authorized to perform: ecr:TagResource").build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(), any());
+
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, null, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handleRequest_ResourceTagsPermissionError() {
+        doThrow(EcrException.builder().message("not authorized to perform: ecr:TagResource").build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(), any());
+
+        final Set<Tag> tags = ImmutableSet.of(Tag.builder().key("key1").value("val1").build());
+
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .tags(tags)
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        assertThrows(CfnGeneralServiceException.class,
+                () -> handler.handleRequest(proxy, request, null, logger));
+    }
+
+    @Test
+    public void handleRequest_EcrException() {
+        doThrow(EcrException.builder().message("general exception").build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(), any());
+
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        assertThrows(CfnGeneralServiceException.class,
                 () -> handler.handleRequest(proxy, request, null, logger));
     }
 }

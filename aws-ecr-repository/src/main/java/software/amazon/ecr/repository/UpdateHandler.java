@@ -1,5 +1,8 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesResponse;
+import software.amazon.awssdk.services.ecr.model.EcrException;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -13,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import software.amazon.awssdk.services.ecr.EcrClient;
-import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesResponse;
 import software.amazon.awssdk.services.ecr.model.LifecyclePolicyNotFoundException;
 import software.amazon.awssdk.services.ecr.model.RepositoryNotFoundException;
 import software.amazon.awssdk.services.ecr.model.RepositoryPolicyNotFoundException;
@@ -63,6 +65,12 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             handleTagging(request.getDesiredResourceTags(), arn);
         } catch (RepositoryNotFoundException e) {
             throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());
+        } catch (EcrException e) {
+            if (isTaggingPermissionException(e) && model.getTags() == null) {
+                logger.log("Swallowing permission exception for stack-level tag-only update.");
+            } else {
+                throw new CfnGeneralServiceException(e.getMessage());
+            }
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
@@ -87,4 +95,8 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         if (!CollectionUtils.isNullOrEmpty(tagsToAdd)) proxy.injectCredentialsAndInvokeV2(Translator.tagResourceRequest(tagsToAdd, arn), client::tagResource);
     }
 
+    public static Boolean isTaggingPermissionException(final Exception e) {
+        final String message = "not authorized to perform: %s";
+        return e.getMessage().contains(String.format(message, "ecr:TagResource")) || e.getMessage().contains(String.format(message, "ecr:UntagResource"));
+    }
 }

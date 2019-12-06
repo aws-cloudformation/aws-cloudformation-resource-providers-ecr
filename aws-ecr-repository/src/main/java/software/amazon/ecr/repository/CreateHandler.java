@@ -1,5 +1,7 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.EcrException;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -44,6 +46,12 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             logger.log(String.format("%s [%s] Created Successfully", ResourceModel.TYPE_NAME, model.getRepositoryName()));
         } catch (RepositoryAlreadyExistsException e) {
             throw new ResourceAlreadyExistsException(ResourceModel.TYPE_NAME, model.getRepositoryName());
+        } catch (EcrException e) {
+            if (UpdateHandler.isTaggingPermissionException(e) && model.getTags() == null) {
+                logger.log("Swallowing permission exception for stack-level tag-only update.");
+            } else {
+                throw new CfnGeneralServiceException(e.getMessage());
+            }
         }
 
         if (model.getLifecyclePolicy() != null) proxy.injectCredentialsAndInvokeV2(Translator.putLifecyclePolicyRequest(model), client::putLifecyclePolicy);
