@@ -1,9 +1,11 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
 import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesResponse;
 import software.amazon.awssdk.services.ecr.model.EcrException;
 import software.amazon.awssdk.services.ecr.model.Repository;
+import software.amazon.awssdk.services.ecr.model.TagResourceRequest;
 import software.amazon.awssdk.services.ecr.model.UntagResourceRequest;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
@@ -227,10 +229,21 @@ public class UpdateHandlerTest {
 
     @Test
     public void handleRequest_StackTagsPermissionError() {
-        doThrow(EcrException.builder().message("not authorized to perform: ecr:TagResource").build(),
-                EcrException.builder().message("not authorized to perform: ecr:UntagResource").build())
+        doThrow(RepositoryPolicyNotFoundException.class)
                 .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+                .injectCredentialsAndInvokeV2(any(DeleteRepositoryPolicyRequest.class), any());
+        doThrow(LifecyclePolicyNotFoundException.class)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DeleteLifecyclePolicyRequest.class), any());
+        doReturn(describeRepositoriesResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeRepositoriesRequest.class), any());
+        doReturn(listTagsForResourceResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
+        doThrow(EcrException.builder().awsErrorDetails(AwsErrorDetails.builder().errorCode("AccessDeniedException").errorMessage("ecr:TagResource").build()).build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(TagResourceRequest.class), any());
 
         final ResourceModel model = ResourceModel.builder()
                 .repositoryName("repo")
@@ -238,6 +251,7 @@ public class UpdateHandlerTest {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
+                .desiredResourceTags(newTagsMap)
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response
@@ -271,7 +285,7 @@ public class UpdateHandlerTest {
         doReturn(listTagsForResourceResponse)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
-        doThrow(EcrException.builder().message("not authorized to perform: ecr:UntagResource").build())
+        doThrow(EcrException.builder().awsErrorDetails(AwsErrorDetails.builder().errorCode("AccessDeniedException").errorMessage("ecr:UntagResource").build()).build())
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(UntagResourceRequest.class), any());
 
@@ -291,16 +305,34 @@ public class UpdateHandlerTest {
 
     @Test
     public void handleRequest_EcrException() {
-        doThrow(EcrException.builder().message("general exception").build())
+        final ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
+                .tags(existingTags)
+                .build();
+
+        doThrow(RepositoryPolicyNotFoundException.class)
                 .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+                .injectCredentialsAndInvokeV2(any(DeleteRepositoryPolicyRequest.class), any());
+        doThrow(LifecyclePolicyNotFoundException.class)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DeleteLifecyclePolicyRequest.class), any());
+        doReturn(describeRepositoriesResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeRepositoriesRequest.class), any());
+        doReturn(listTagsForResourceResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
+        doThrow(EcrException.builder().awsErrorDetails(AwsErrorDetails.builder().errorCode("error code").errorMessage("error message").build()).build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(UntagResourceRequest.class), any());
 
         final ResourceModel model = ResourceModel.builder()
                 .repositoryName("repo")
+                .tags(newTags)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
+                .desiredResourceTags(newTagsMap)
                 .build();
 
         assertThrows(CfnGeneralServiceException.class,

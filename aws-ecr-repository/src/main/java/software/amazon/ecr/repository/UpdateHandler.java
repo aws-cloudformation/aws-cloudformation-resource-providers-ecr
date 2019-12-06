@@ -62,9 +62,12 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             final DescribeRepositoriesResponse describeResponse = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), client::describeRepositories);
             final String arn = describeResponse.repositories().get(0).repositoryArn();
             model.setArn(arn);
-            handleTagging(request.getDesiredResourceTags(), arn);
         } catch (RepositoryNotFoundException e) {
             throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());
+        }
+
+        try {
+            handleTagging(request.getDesiredResourceTags(), model.getArn());
         } catch (EcrException e) {
             if (isTaggingPermissionException(e) && model.getTags() == null) {
                 logger.log("Swallowing permission exception for stack-level tag-only update.");
@@ -95,8 +98,8 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         if (!CollectionUtils.isNullOrEmpty(tagsToAdd)) proxy.injectCredentialsAndInvokeV2(Translator.tagResourceRequest(tagsToAdd, arn), client::tagResource);
     }
 
-    public static Boolean isTaggingPermissionException(final Exception e) {
-        final String message = "not authorized to perform: %s";
-        return e.getMessage().contains(String.format(message, "ecr:TagResource")) || e.getMessage().contains(String.format(message, "ecr:UntagResource"));
+    public static Boolean isTaggingPermissionException(final EcrException e) {
+        return e.awsErrorDetails().errorCode().equals("AccessDeniedException") &&
+                (e.getMessage().contains("ecr:TagResource") || e.getMessage().contains("ecr:UntagResource"));
     }
 }

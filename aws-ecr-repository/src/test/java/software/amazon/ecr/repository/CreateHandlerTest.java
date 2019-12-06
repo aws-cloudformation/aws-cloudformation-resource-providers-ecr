@@ -1,6 +1,7 @@
 package software.amazon.ecr.repository;
 
 import com.google.common.collect.ImmutableSet;
+import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.services.ecr.model.EcrException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -147,7 +148,7 @@ public class CreateHandlerTest {
 
     @Test
     public void handleRequest_StackTagsPermissionError() {
-        doThrow(EcrException.builder().message("not authorized to perform: ecr:TagResource").build())
+        doThrow(EcrException.builder().awsErrorDetails(AwsErrorDetails.builder().errorMessage("ecr:TagResource").errorCode("AccessDeniedException").build()).build())
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(), any());
 
@@ -174,7 +175,7 @@ public class CreateHandlerTest {
 
     @Test
     public void handleRequest_ResourceTagsPermissionError() {
-        doThrow(EcrException.builder().message("not authorized to perform: ecr:TagResource").build())
+        doThrow(EcrException.builder().awsErrorDetails(AwsErrorDetails.builder().errorMessage("ecr:TagResource").errorCode("AccessDeniedException").build()).build())
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(), any());
 
@@ -195,7 +196,7 @@ public class CreateHandlerTest {
 
     @Test
     public void handleRequest_EcrException() {
-        doThrow(EcrException.builder().message("general exception").build())
+        doThrow(EcrException.builder().awsErrorDetails(AwsErrorDetails.builder().errorCode("error code").errorMessage("error message").build()).build())
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(), any());
 
