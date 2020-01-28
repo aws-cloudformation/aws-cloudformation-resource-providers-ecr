@@ -33,6 +33,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             final Logger logger) {
 
         final ResourceModel model = request.getDesiredResourceState();
+        final String accountId = request.getAwsAccountId();
         this.client = ClientBuilder.getClient();
         this.proxy = proxy;
 
@@ -55,6 +56,14 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
                 } catch (LifecyclePolicyNotFoundException e) {
                     // there's no policy to delete
                 }
+            }
+
+            if (model.getImageTagMutability() != null) {
+                proxy.injectCredentialsAndInvokeV2(Translator.putImageTagMutabilityRequest(model, accountId), client::putImageTagMutability);
+            }
+
+            if (model.getImageScanningConfiguration() != null) {
+                proxy.injectCredentialsAndInvokeV2(Translator.putImageScanningConfigurationRequest(model, accountId), client::putImageScanningConfiguration);
             }
 
             final DescribeRepositoriesResponse describeResponse = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), client::describeRepositories);
