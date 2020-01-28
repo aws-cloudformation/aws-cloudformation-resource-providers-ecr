@@ -83,7 +83,10 @@
         "ImageTagMutability": {
             "type": "string",
             "description": "The image tag mutability setting for the repository.",
-            "enum": ["MUTABLE", "IMMUTABLE"]
+            "enum": [
+                "MUTABLE",
+                "IMMUTABLE"
+            ]
         },
         "ImageScanningConfiguration": {
             "type": "object",
