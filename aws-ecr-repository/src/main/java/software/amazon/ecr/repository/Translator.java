@@ -8,6 +8,7 @@ import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
 import software.amazon.awssdk.services.ecr.model.GetLifecyclePolicyRequest;
 import software.amazon.awssdk.services.ecr.model.GetRepositoryPolicyRequest;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
+import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.awssdk.services.ecr.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.ecr.model.PutImageScanningConfigurationRequest;
 import software.amazon.awssdk.services.ecr.model.PutImageTagMutabilityRequest;
@@ -147,7 +148,7 @@ public class Translator {
     static PutImageTagMutabilityRequest putImageTagMutabilityRequest(final ResourceModel model,
                                                                      final String registryId) {
 
-        String imageTagMutability = "MUTABLE";
+        String imageTagMutability = ImageTagMutability.MUTABLE.toString();
         if (model.getImageTagMutability() != null) {
             imageTagMutability = model.getImageTagMutability();
         }
