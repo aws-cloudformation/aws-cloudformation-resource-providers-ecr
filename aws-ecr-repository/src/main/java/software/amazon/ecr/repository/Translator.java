@@ -162,7 +162,7 @@ public class Translator {
     static PutImageScanningConfigurationRequest putImageScanningConfigurationRequest(final ResourceModel model,
                                                                                      final String registryId) {
 
-        boolean scanOnPush = true;
+        boolean scanOnPush = false;
         if (model.getImageScanningConfiguration() != null && model.getImageScanningConfiguration().getScanOnPush() != null) {
             scanOnPush = model.getImageScanningConfiguration().getScanOnPush();
         }
