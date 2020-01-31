@@ -82,6 +82,19 @@ public class UpdateHandlerTest {
             .tags(Collections.emptyList())
             .build();
 
+    private SetRepositoryPolicyResponse setRepositoryPolicyResponse = SetRepositoryPolicyResponse.builder().build();
+    private PutLifecyclePolicyResponse putLifecyclePolicyResponse = PutLifecyclePolicyResponse.builder().build();
+
+    private DeleteRepositoryPolicyResponse deleteRepositoryPolicyResponse = DeleteRepositoryPolicyResponse.builder().build();
+    private DeleteLifecyclePolicyResponse deleteLifecyclePolicyResponse = DeleteLifecyclePolicyResponse.builder().build();
+
+    private UntagResourceResponse untagResourceResponse = UntagResourceResponse.builder().build();
+    private TagResourceResponse tagResourceResponse = TagResourceResponse.builder().build();
+
+    private PutImageTagMutabilityResponse putImageTagMutabilityResponse = PutImageTagMutabilityResponse.builder().build();
+    private PutImageScanningConfigurationResponse putImageScanningConfigurationResponse = PutImageScanningConfigurationResponse.builder().build();
+
+
     @BeforeEach
     public void setup() {
         handler = new UpdateHandler();
@@ -89,13 +102,6 @@ public class UpdateHandlerTest {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final SetRepositoryPolicyResponse setRepositoryPolicyResponse = SetRepositoryPolicyResponse.builder().build();
-        final PutLifecyclePolicyResponse putLifecyclePolicyResponse = PutLifecyclePolicyResponse.builder().build();
-        final UntagResourceResponse untagResourceResponse = UntagResourceResponse.builder().build();
-        final TagResourceResponse tagResourceResponse = TagResourceResponse.builder().build();
-        final PutImageTagMutabilityResponse putImageTagMutabilityResponse = PutImageTagMutabilityResponse.builder().build();
-        final PutImageScanningConfigurationResponse putImageScanningConfigurationResponse = PutImageScanningConfigurationResponse.builder().build();
-
         final List<software.amazon.awssdk.services.ecr.model.Tag> existingTags = ImmutableList.of(
                 software.amazon.awssdk.services.ecr.model.Tag.builder().key("key1").value("val1").build(),
                 software.amazon.awssdk.services.ecr.model.Tag.builder().key("key2").value("val2").build()
@@ -157,15 +163,12 @@ public class UpdateHandlerTest {
 
     @Test
     public void handleRequest_RemoveProperties() {
-        final DeleteRepositoryPolicyResponse deleteRepositoryPolicyResponse = DeleteRepositoryPolicyResponse.builder().build();
-        final DeleteLifecyclePolicyResponse deleteLifecyclePolicyResponse = DeleteLifecyclePolicyResponse.builder().build();
-
-        doReturn(deleteRepositoryPolicyResponse,
-                deleteLifecyclePolicyResponse,
-                describeRepositoriesResponse,
-                listTagsForResourceResponse)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doReturn(deleteRepositoryPolicyResponse).when(proxy).injectCredentialsAndInvokeV2(any(DeleteRepositoryPolicyRequest.class), any());
+        doReturn(deleteLifecyclePolicyResponse).when(proxy).injectCredentialsAndInvokeV2(any(DeleteLifecyclePolicyRequest.class), any());
+        doReturn(describeRepositoriesResponse).when(proxy).injectCredentialsAndInvokeV2(any(DescribeRepositoriesRequest.class), any());
+        doReturn(listTagsForResourceResponse).when(proxy).injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
+        doReturn(putImageTagMutabilityResponse).when(proxy).injectCredentialsAndInvokeV2(any(PutImageTagMutabilityRequest.class), any());
+        doReturn(putImageScanningConfigurationResponse).when(proxy).injectCredentialsAndInvokeV2(any(PutImageScanningConfigurationRequest.class), any());
 
         final ResourceModel model = ResourceModel.builder()
                 .repositoryName("repo")
@@ -202,6 +205,12 @@ public class UpdateHandlerTest {
         doReturn(listTagsForResourceResponse)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
+        doReturn(putImageTagMutabilityResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(PutImageTagMutabilityRequest.class), any());
+        doReturn(putImageScanningConfigurationResponse)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(PutImageScanningConfigurationRequest.class), any());
 
         final ResourceModel model = ResourceModel.builder()
                 .repositoryName("repo")
