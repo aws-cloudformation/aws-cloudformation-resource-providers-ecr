@@ -147,27 +147,17 @@ public class Translator {
 
     static PutImageTagMutabilityRequest putImageTagMutabilityRequest(final ResourceModel model,
                                                                      final String registryId) {
-
-        String imageTagMutability = ImageTagMutability.MUTABLE.toString();
-        if (model.getImageTagMutability() != null) {
-            imageTagMutability = model.getImageTagMutability();
-        }
         return PutImageTagMutabilityRequest.builder()
                 .registryId(registryId)
                 .repositoryName(model.getRepositoryName())
-                .imageTagMutability(imageTagMutability)
+                .imageTagMutability(model.getImageTagMutability())
                 .build();
     }
 
     static PutImageScanningConfigurationRequest putImageScanningConfigurationRequest(final ResourceModel model,
                                                                                      final String registryId) {
-
-        boolean scanOnPush = false;
-        if (model.getImageScanningConfiguration() != null && model.getImageScanningConfiguration().getScanOnPush() != null) {
-            scanOnPush = model.getImageScanningConfiguration().getScanOnPush();
-        }
         ImageScanningConfiguration sdkImageScanningConfiguration = ImageScanningConfiguration.builder()
-                .scanOnPush(scanOnPush).build();
+                .scanOnPush(model.getImageScanningConfiguration().getScanOnPush()).build();
 
         return PutImageScanningConfigurationRequest.builder()
                 .registryId(registryId)
