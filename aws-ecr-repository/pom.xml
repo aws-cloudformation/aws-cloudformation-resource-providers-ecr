@@ -117,7 +117,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>cfn-cli</executable>
+                            <executable>cfn</executable>
                             <commandlineArgs>generate</commandlineArgs>
                             <workingDirectory>${project.basedir}</workingDirectory>
                         </configuration>
