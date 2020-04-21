@@ -1,5 +1,6 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -33,6 +34,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             final Logger logger) {
 
         final ResourceModel model = request.getDesiredResourceState();
+        final String accountId = request.getAwsAccountId();
         this.client = ClientBuilder.getClient();
         this.proxy = proxy;
 
@@ -56,6 +58,20 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
                     // there's no policy to delete
                 }
             }
+
+            // ImageTagMutability default value is MUTABLE
+            if (model.getImageTagMutability() == null) {
+                model.setImageTagMutability(ImageTagMutability.MUTABLE.toString());
+            }
+            proxy.injectCredentialsAndInvokeV2(Translator.putImageTagMutabilityRequest(model, accountId), client::putImageTagMutability);
+
+            // ImageScanningConfiguration ScanOnPush default value is false
+            if (model.getImageScanningConfiguration() == null) {
+                model.setImageScanningConfiguration(ImageScanningConfiguration.builder().scanOnPush(false).build());
+            } else if (model.getImageScanningConfiguration().getScanOnPush() == null) {
+                model.getImageScanningConfiguration().setScanOnPush(false);
+            }
+            proxy.injectCredentialsAndInvokeV2(Translator.putImageScanningConfigurationRequest(model, accountId), client::putImageScanningConfiguration);
 
             final DescribeRepositoriesResponse describeResponse = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), client::describeRepositories);
             final String arn = describeResponse.repositories().get(0).repositoryArn();

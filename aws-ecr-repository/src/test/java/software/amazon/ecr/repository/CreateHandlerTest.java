@@ -1,5 +1,6 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -42,6 +43,11 @@ public class CreateHandlerTest {
             .repositoryName("repo")
             .registryId("id")
             .repositoryArn("arn")
+            .imageTagMutability("IMMUTABLE")
+            .imageScanningConfiguration(
+                    ImageScanningConfiguration.builder()
+                            .scanOnPush(true)
+                            .build())
             .build();
 
     private CreateRepositoryResponse createRepositoryResponse = CreateRepositoryResponse.builder()
@@ -71,6 +77,11 @@ public class CreateHandlerTest {
                 .lifecyclePolicy(lifecyclePolicy)
                 .repositoryPolicyText(repositoryPolicy)
                 .tags(tags)
+                .imageTagMutability("IMMUTABLE")
+                .imageScanningConfiguration(
+                        software.amazon.ecr.repository.ImageScanningConfiguration.builder()
+                                .scanOnPush(true)
+                                .build())
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()

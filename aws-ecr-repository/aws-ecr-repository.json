@@ -37,6 +37,10 @@
                 "Value",
                 "Key"
             ]
+        },
+        "ScanOnPush": {
+            "type": "boolean",
+            "description": "The setting that determines whether images are scanned after being pushed to a repository."
         }
     },
     "properties": {
@@ -75,6 +79,23 @@
         },
         "Arn": {
             "type": "string"
+        },
+        "ImageTagMutability": {
+            "type": "string",
+            "description": "The image tag mutability setting for the repository.",
+            "enum": [
+                "MUTABLE",
+                "IMMUTABLE"
+            ]
+        },
+        "ImageScanningConfiguration": {
+            "type": "object",
+            "description": "The image scanning configuration for the repository. This setting determines whether images are scanned for known vulnerabilities after being pushed to the repository.",
+            "properties": {
+                "ScanOnPush": {
+                    "$ref": "#/definitions/ScanOnPush"
+                }
+            }
         }
     },
     "createOnlyProperties": [
@@ -110,7 +131,9 @@
                 "ecr:TagResource",
                 "ecr:UntagResource",
                 "ecr:DeleteLifecyclePolicy",
-                "ecr:DeleteRepositoryPolicy"
+                "ecr:DeleteRepositoryPolicy",
+                "ecr:PutImageScanningConfiguration",
+                "ecr:PutImageTagMutability"
             ]
         },
         "delete": {
