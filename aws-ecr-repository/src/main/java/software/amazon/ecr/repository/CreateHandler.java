@@ -39,7 +39,11 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         try {
-            final CreateRepositoryResponse response = proxy.injectCredentialsAndInvokeV2(Translator.createRepositoryRequest(model, request.getDesiredResourceTags()), client::createRepository);
+            final CreateRepositoryResponse response = proxy.injectCredentialsAndInvokeV2(
+                    Translator.createRepositoryRequest(
+                            model,
+                            request.getDesiredResourceTags()),
+                    client::createRepository);
             model.setArn(response.repository().repositoryArn());
             logger.log(String.format("%s [%s] Created Successfully", ResourceModel.TYPE_NAME, model.getRepositoryName()));
         } catch (RepositoryAlreadyExistsException e) {

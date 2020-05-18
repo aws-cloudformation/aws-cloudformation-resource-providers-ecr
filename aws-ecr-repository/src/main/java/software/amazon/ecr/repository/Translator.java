@@ -1,5 +1,22 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.CreateRepositoryRequest;
+import software.amazon.awssdk.services.ecr.model.DeleteLifecyclePolicyRequest;
+import software.amazon.awssdk.services.ecr.model.DeleteRepositoryPolicyRequest;
+import software.amazon.awssdk.services.ecr.model.DeleteRepositoryRequest;
+import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
+import software.amazon.awssdk.services.ecr.model.GetLifecyclePolicyRequest;
+import software.amazon.awssdk.services.ecr.model.GetRepositoryPolicyRequest;
+import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
+import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
+import software.amazon.awssdk.services.ecr.model.ListTagsForResourceRequest;
+import software.amazon.awssdk.services.ecr.model.PutImageScanningConfigurationRequest;
+import software.amazon.awssdk.services.ecr.model.PutImageTagMutabilityRequest;
+import software.amazon.awssdk.services.ecr.model.PutLifecyclePolicyRequest;
+import software.amazon.awssdk.services.ecr.model.SetRepositoryPolicyRequest;
+import software.amazon.awssdk.services.ecr.model.Tag;
+import software.amazon.awssdk.services.ecr.model.TagResourceRequest;
+import software.amazon.awssdk.services.ecr.model.UntagResourceRequest;
 import software.amazon.cloudformation.exceptions.TerminalException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,29 +26,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import software.amazon.awssdk.services.ecr.model.CreateRepositoryRequest;
-import software.amazon.awssdk.services.ecr.model.DeleteLifecyclePolicyRequest;
-import software.amazon.awssdk.services.ecr.model.DeleteRepositoryPolicyRequest;
-import software.amazon.awssdk.services.ecr.model.DeleteRepositoryRequest;
-import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
-import software.amazon.awssdk.services.ecr.model.GetLifecyclePolicyRequest;
-import software.amazon.awssdk.services.ecr.model.GetRepositoryPolicyRequest;
-import software.amazon.awssdk.services.ecr.model.ListTagsForResourceRequest;
-import software.amazon.awssdk.services.ecr.model.PutLifecyclePolicyRequest;
-import software.amazon.awssdk.services.ecr.model.SetRepositoryPolicyRequest;
-import software.amazon.awssdk.services.ecr.model.Tag;
-import software.amazon.awssdk.services.ecr.model.TagResourceRequest;
-import software.amazon.awssdk.services.ecr.model.UntagResourceRequest;
+
 import software.amazon.awssdk.utils.CollectionUtils;
 
 public class Translator {
     public static final ObjectMapper MAPPER = new ObjectMapper();
 
-    static CreateRepositoryRequest createRepositoryRequest(final ResourceModel model, final Map<String, String> tags) {
-        return CreateRepositoryRequest.builder()
+    static CreateRepositoryRequest createRepositoryRequest(final ResourceModel model,
+                                                           final Map<String, String> tags) {
+
+        CreateRepositoryRequest.Builder createRepositoryRequest = CreateRepositoryRequest.builder()
                 .repositoryName(model.getRepositoryName())
-                .tags(translateTagsToSdk(tags))
-                .build();
+                .tags(translateTagsToSdk(tags));
+
+        if (model.getImageScanningConfiguration() != null) {
+            createRepositoryRequest.imageScanningConfiguration(ImageScanningConfiguration.builder()
+                    .scanOnPush(model.getImageScanningConfiguration().getScanOnPush()).build());
+        }
+
+        if (model.getImageTagMutability() != null) {
+            createRepositoryRequest.imageTagMutability(model.getImageTagMutability());
+        }
+
+        return createRepositoryRequest.build();
     }
 
     static PutLifecyclePolicyRequest putLifecyclePolicyRequest(final ResourceModel model) {
@@ -125,6 +142,27 @@ public class Translator {
         return GetLifecyclePolicyRequest.builder()
                 .repositoryName(repositoryName)
                 .registryId(registryId)
+                .build();
+    }
+
+    static PutImageTagMutabilityRequest putImageTagMutabilityRequest(final ResourceModel model,
+                                                                     final String registryId) {
+        return PutImageTagMutabilityRequest.builder()
+                .registryId(registryId)
+                .repositoryName(model.getRepositoryName())
+                .imageTagMutability(model.getImageTagMutability())
+                .build();
+    }
+
+    static PutImageScanningConfigurationRequest putImageScanningConfigurationRequest(final ResourceModel model,
+                                                                                     final String registryId) {
+        ImageScanningConfiguration sdkImageScanningConfiguration = ImageScanningConfiguration.builder()
+                .scanOnPush(model.getImageScanningConfiguration().getScanOnPush()).build();
+
+        return PutImageScanningConfigurationRequest.builder()
+                .registryId(registryId)
+                .repositoryName(model.getRepositoryName())
+                .imageScanningConfiguration(sdkImageScanningConfiguration)
                 .build();
     }
 }
