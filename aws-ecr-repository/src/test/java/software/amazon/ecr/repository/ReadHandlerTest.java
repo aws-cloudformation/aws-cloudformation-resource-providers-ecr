@@ -1,5 +1,7 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
+import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -50,6 +52,8 @@ public class ReadHandlerTest {
             .repositoryName("repo")
             .registryId("id")
             .repositoryArn("arn")
+            .imageScanningConfiguration(ImageScanningConfiguration.builder().scanOnPush(true).build())
+            .imageTagMutability(ImageTagMutability.MUTABLE)
             .build();
 
     private DescribeRepositoriesResponse describeRepositoriesResponse = DescribeRepositoriesResponse.builder()
@@ -106,6 +110,8 @@ public class ReadHandlerTest {
                         .build())
                 .tags(tags)
                 .arn("arn")
+                .imageTagMutability("MUTABLE")
+                .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(true).build())
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
@@ -154,6 +160,8 @@ public class ReadHandlerTest {
                 .lifecyclePolicy(null)
                 .tags(tags)
                 .arn("arn")
+                .imageTagMutability("MUTABLE")
+                .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(true).build())
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
@@ -216,6 +224,8 @@ public class ReadHandlerTest {
                         .build())
                 .tags(tags)
                 .arn("arn")
+                .imageTagMutability("MUTABLE")
+                .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(true).build())
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =

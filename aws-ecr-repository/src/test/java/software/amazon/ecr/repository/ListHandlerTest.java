@@ -1,5 +1,7 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
+import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -47,6 +49,8 @@ public class ListHandlerTest {
                 .repositoryName("repo")
                 .registryId("id")
                 .repositoryArn("arn")
+                .imageScanningConfiguration(ImageScanningConfiguration.builder().scanOnPush(false).build())
+                .imageTagMutability(ImageTagMutability.IMMUTABLE)
                 .build();
 
         final DescribeRepositoriesResponse describeRepositoriesResponse = DescribeRepositoriesResponse.builder()
@@ -97,6 +101,8 @@ public class ListHandlerTest {
                         .build())
                 .tags(tags)
                 .arn("arn")
+                .imageTagMutability("IMMUTABLE")
+                .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(false).build())
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =

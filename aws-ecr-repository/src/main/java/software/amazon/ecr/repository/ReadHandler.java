@@ -90,6 +90,8 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                 .repositoryPolicyText(repositoryPolicyText)
                 .tags(tags)
                 .arn(arn)
+                .imageScanningConfiguration(ImageScanningConfiguration.builder().scanOnPush(repo.imageScanningConfiguration().scanOnPush()).build())
+                .imageTagMutability(repo.imageTagMutability().toString())
                 .build();
     }
 }
