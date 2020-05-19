@@ -23,22 +23,10 @@ public class CreateHandler extends BaseHandlerStd {
         final ProxyClient<EcrClient> proxyClient,
         final Logger logger) {
 
-//public class CreateHandler extends BaseHandler<CallbackContext> {
-//    private static final int MAX_REPO_NAME_LENGTH = 256;
-//
-//    @Override
-//    public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-//            final AmazonWebServicesClientProxy proxy,
-//            final ResourceHandlerRequest<ResourceModel> request,
-//            final CallbackContext callbackContext,
-//            final Logger logger) {
-
         final ResourceModel model = request.getDesiredResourceState();
         final EcrClient client = proxyClient.client();
 
-        // resource can auto-generate a name if not supplied by caller
-        // this logic should move up into the CloudFormation engine, but
-        // currently exists here for backwards-compatibility with existing models
+        // Auto-generate RepositoryName if not supplied
         if (StringUtils.isNullOrEmpty(model.getRepositoryName())) {
             model.setRepositoryName(
                     IdentifierUtils.generateResourceIdentifier(
