@@ -1,10 +1,11 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.EcrClient;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,15 +28,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-public class CreateHandlerTest {
+public class CreateHandlerTest extends AbstractTestBase {
 
     @Mock
     private AmazonWebServicesClientProxy proxy;
 
     @Mock
-    private Logger logger;
+    private ProxyClient<EcrClient> proxyEcrClient;
+
+    @Mock
+    EcrClient ecr;
 
     private CreateHandler handler;
 
@@ -57,6 +62,9 @@ public class CreateHandlerTest {
     @BeforeEach
     public void setup() {
         handler = new CreateHandler();
+        ecr = mock(EcrClient.class);
+        proxy = mock(AmazonWebServicesClientProxy.class);
+        proxyEcrClient = MOCK_PROXY(proxy, ecr);
     }
 
     @Test
@@ -94,7 +102,7 @@ public class CreateHandlerTest {
                 .injectCredentialsAndInvokeV2(any(CreateRepositoryRequest.class), any());
 
         final ProgressEvent<ResourceModel, CallbackContext> response
-            = handler.handleRequest(proxy, request, null, logger);
+            = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -122,7 +130,7 @@ public class CreateHandlerTest {
                 .injectCredentialsAndInvokeV2(any(CreateRepositoryRequest.class), any());
 
         final ProgressEvent<ResourceModel, CallbackContext> response
-                = handler.handleRequest(proxy, request, null, logger);
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -150,6 +158,6 @@ public class CreateHandlerTest {
                 .build();
 
         assertThrows(ResourceAlreadyExistsException.class,
-                () -> handler.handleRequest(proxy, request, null, logger));
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger));
     }
 }

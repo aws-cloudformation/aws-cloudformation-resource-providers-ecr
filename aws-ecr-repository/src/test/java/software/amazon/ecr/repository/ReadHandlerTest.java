@@ -1,5 +1,6 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.EcrClient;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
 import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
@@ -7,6 +8,7 @@ import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,15 +38,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-public class ReadHandlerTest {
+public class ReadHandlerTest extends AbstractTestBase {
 
     @Mock
     private AmazonWebServicesClientProxy proxy;
 
     @Mock
-    private Logger logger;
+    private ProxyClient<EcrClient> proxyEcrClient;
+
+    @Mock
+    EcrClient ecr;
 
     private ReadHandler handler;
 
@@ -78,7 +84,10 @@ public class ReadHandlerTest {
 
     @BeforeEach
     public void setup() {
-         handler = new ReadHandler();
+        handler = new ReadHandler();
+        ecr = mock(EcrClient.class);
+        proxy = mock(AmazonWebServicesClientProxy.class);
+        proxyEcrClient = MOCK_PROXY(proxy, ecr);
     }
 
     @Test
@@ -115,7 +124,7 @@ public class ReadHandlerTest {
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, null, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -165,7 +174,7 @@ public class ReadHandlerTest {
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, null, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -191,7 +200,7 @@ public class ReadHandlerTest {
                 .build();
 
         assertThrows(ResourceNotFoundException.class,
-                () -> handler.handleRequest(proxy, request, null, logger));
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger));
     }
 
     @Test
@@ -229,7 +238,7 @@ public class ReadHandlerTest {
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, null, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

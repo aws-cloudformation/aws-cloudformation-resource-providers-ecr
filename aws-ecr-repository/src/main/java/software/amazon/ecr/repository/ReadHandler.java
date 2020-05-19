@@ -6,6 +6,7 @@ import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
@@ -22,26 +23,26 @@ import software.amazon.awssdk.services.ecr.model.Repository;
 import software.amazon.awssdk.services.ecr.model.RepositoryNotFoundException;
 import software.amazon.awssdk.services.ecr.model.RepositoryPolicyNotFoundException;
 
-public class ReadHandler extends BaseHandler<CallbackContext> {
+public class ReadHandler extends BaseHandlerStd {
 
-    @Override
-    public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
+    protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
+        final ProxyClient<EcrClient> proxyClient,
         final Logger logger) {
 
         final ResourceModel model = request.getDesiredResourceState();
         final DescribeRepositoriesResponse response;
 
         try {
-            response = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), ClientBuilder.getClient()::describeRepositories);
+            response = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), proxyClient.client()::describeRepositories);
         } catch (RepositoryNotFoundException e) {
             throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
-                .resourceModel(buildModel(proxy, response.repositories().get(0)))
+                .resourceModel(buildModel(proxy, proxyClient, response.repositories().get(0)))
                 .status(OperationStatus.SUCCESS)
                 .build();
     }
@@ -55,11 +56,11 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
         }
     }
 
-    public static ResourceModel buildModel(final AmazonWebServicesClientProxy proxy, final Repository repo) {
+    public static ResourceModel buildModel(final AmazonWebServicesClientProxy proxy, final ProxyClient<EcrClient> proxyClient, final Repository repo) {
         final String arn = repo.repositoryArn();
         final String repositoryName = repo.repositoryName();
         final String registryId = repo.registryId();
-        final EcrClient client = ClientBuilder.getClient();
+        final EcrClient client = proxyClient.client();
 
         Map<String, Object> repositoryPolicyText = null;
         LifecyclePolicy lifecyclePolicy = null;
