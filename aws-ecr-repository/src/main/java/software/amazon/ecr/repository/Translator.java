@@ -123,7 +123,7 @@ public class Translator {
     }
 
     static Set<software.amazon.ecr.repository.Tag> translateTagsFromSdk(final List<Tag> tags) {
-        if (CollectionUtils.isNullOrEmpty(tags)) return null;
+        if (tags == null) return null;
         return tags.stream().map(tag -> software.amazon.ecr.repository.Tag.builder()
                 .key(tag.key())
                 .value(tag.value())
