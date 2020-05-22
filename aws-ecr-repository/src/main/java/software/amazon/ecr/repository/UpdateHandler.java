@@ -6,6 +6,7 @@ import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,21 +22,21 @@ import software.amazon.awssdk.services.ecr.model.RepositoryPolicyNotFoundExcepti
 import software.amazon.awssdk.services.ecr.model.Tag;
 import software.amazon.awssdk.utils.CollectionUtils;
 
-public class UpdateHandler extends BaseHandler<CallbackContext> {
+public class UpdateHandler extends BaseHandlerStd {
 
     private AmazonWebServicesClientProxy proxy;
     private EcrClient client;
 
-    @Override
-    public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final Logger logger) {
+    protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final ProxyClient<EcrClient> proxyClient,
+        final Logger logger) {
 
         final ResourceModel model = request.getDesiredResourceState();
         final String accountId = request.getAwsAccountId();
-        this.client = ClientBuilder.getClient();
+        this.client = proxyClient.client();
         this.proxy = proxy;
 
         try {
