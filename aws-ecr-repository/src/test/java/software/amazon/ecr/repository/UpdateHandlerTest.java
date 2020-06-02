@@ -167,8 +167,6 @@ public class UpdateHandlerTest {
         doReturn(deleteLifecyclePolicyResponse).when(proxy).injectCredentialsAndInvokeV2(any(DeleteLifecyclePolicyRequest.class), any());
         doReturn(describeRepositoriesResponse).when(proxy).injectCredentialsAndInvokeV2(any(DescribeRepositoriesRequest.class), any());
         doReturn(listTagsForResourceResponse).when(proxy).injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
-        doReturn(putImageTagMutabilityResponse).when(proxy).injectCredentialsAndInvokeV2(any(PutImageTagMutabilityRequest.class), any());
-        doReturn(putImageScanningConfigurationResponse).when(proxy).injectCredentialsAndInvokeV2(any(PutImageScanningConfigurationRequest.class), any());
 
         final ResourceModel model = ResourceModel.builder()
                 .repositoryName("repo")
@@ -205,12 +203,6 @@ public class UpdateHandlerTest {
         doReturn(listTagsForResourceResponse)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
-        doReturn(putImageTagMutabilityResponse)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(PutImageTagMutabilityRequest.class), any());
-        doReturn(putImageScanningConfigurationResponse)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(PutImageScanningConfigurationRequest.class), any());
 
         final ResourceModel model = ResourceModel.builder()
                 .repositoryName("repo")
