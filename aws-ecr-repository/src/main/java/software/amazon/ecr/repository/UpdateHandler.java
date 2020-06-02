@@ -63,7 +63,7 @@ public class UpdateHandler extends BaseHandlerStd {
             if (model.getImageTagMutability() != null) {
                 proxy.injectCredentialsAndInvokeV2(Translator.putImageTagMutabilityRequest(model, accountId), client::putImageTagMutability);
             }
-            
+
             if (model.getImageScanningConfiguration() != null) {
                 proxy.injectCredentialsAndInvokeV2(Translator.putImageScanningConfigurationRequest(model, accountId), client::putImageScanningConfiguration);
             }
