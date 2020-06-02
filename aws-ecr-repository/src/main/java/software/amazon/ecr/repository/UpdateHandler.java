@@ -60,19 +60,13 @@ public class UpdateHandler extends BaseHandlerStd {
                 }
             }
 
-            // ImageTagMutability default value is MUTABLE
-            if (model.getImageTagMutability() == null) {
-                model.setImageTagMutability(ImageTagMutability.MUTABLE.toString());
+            if (model.getImageTagMutability() != null) {
+                proxy.injectCredentialsAndInvokeV2(Translator.putImageTagMutabilityRequest(model, accountId), client::putImageTagMutability);
             }
-            proxy.injectCredentialsAndInvokeV2(Translator.putImageTagMutabilityRequest(model, accountId), client::putImageTagMutability);
 
-            // ImageScanningConfiguration ScanOnPush default value is false
-            if (model.getImageScanningConfiguration() == null) {
-                model.setImageScanningConfiguration(ImageScanningConfiguration.builder().scanOnPush(false).build());
-            } else if (model.getImageScanningConfiguration().getScanOnPush() == null) {
-                model.getImageScanningConfiguration().setScanOnPush(false);
+            if (model.getImageScanningConfiguration() != null) {
+                proxy.injectCredentialsAndInvokeV2(Translator.putImageScanningConfigurationRequest(model, accountId), client::putImageScanningConfiguration);
             }
-            proxy.injectCredentialsAndInvokeV2(Translator.putImageScanningConfigurationRequest(model, accountId), client::putImageScanningConfiguration);
 
             final DescribeRepositoriesResponse describeResponse = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), client::describeRepositories);
             final String arn = describeResponse.repositories().get(0).repositoryArn();
