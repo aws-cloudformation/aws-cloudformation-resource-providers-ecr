@@ -30,6 +30,7 @@ Resources:
                 - "ecr:DescribeRepositories"
                 - "ecr:GetLifecyclePolicy"
                 - "ecr:GetRepositoryPolicy"
+                - "ecr:ListTagsForResource"
                 - "ecr:PutImageScanningConfiguration"
                 - "ecr:PutImageTagMutability"
                 - "ecr:PutLifecyclePolicy"
