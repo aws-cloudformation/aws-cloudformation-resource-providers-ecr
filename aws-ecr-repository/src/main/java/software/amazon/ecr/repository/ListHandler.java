@@ -28,7 +28,7 @@ public class ListHandler extends BaseHandlerStd {
         final List<ResourceModel> models = response
                 .repositories()
                 .stream()
-                .map(repository -> buildModel(proxy, proxyClient, repository))
+                .map(repo -> ResourceModel.builder().repositoryName(repo.repositoryName()).build())
                 .collect(Collectors.toList());
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
