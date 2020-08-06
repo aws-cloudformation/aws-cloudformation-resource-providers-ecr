@@ -80,7 +80,7 @@ public class ReadHandler extends BaseHandlerStd {
             if (!e.awsErrorDetails().errorCode().equals(ACCESS_DENIED_ERROR_CODE)) {
                 throw new CfnGeneralServiceException(e.getMessage(), e);
             }
-            logger.log(String.format("AccessDenied error: %s", e.getMessage()));
+            logger.log(String.format("AccessDenied error: %s for Repository: %s", e.getMessage(), repo.toString()));
         }
 
         try {
@@ -95,7 +95,7 @@ public class ReadHandler extends BaseHandlerStd {
             if (!e.awsErrorDetails().errorCode().equals(ACCESS_DENIED_ERROR_CODE)) {
                 throw new CfnGeneralServiceException(e.getMessage(), e);
             }
-            logger.log(String.format("AccessDenied error: %s", e.getMessage()));
+            logger.log(String.format("AccessDenied error: %s for Repository: %s", e.getMessage(), repo.toString()));
         }
 
         try {
@@ -105,7 +105,7 @@ public class ReadHandler extends BaseHandlerStd {
             if (!e.awsErrorDetails().errorCode().equals(ACCESS_DENIED_ERROR_CODE)) {
                 throw new CfnGeneralServiceException(e.getMessage(), e);
             }
-            logger.log(String.format("AccessDenied error: %s", e.getMessage()));
+            logger.log(String.format("AccessDenied error: %s for Repository: %s", e.getMessage(), repo.toString()));
         }
 
         return ResourceModel.builder()
