@@ -103,15 +103,6 @@ public class ListHandlerTest extends AbstractTestBase {
 
         final ResourceModel expectedModel = ResourceModel.builder()
                 .repositoryName("repo")
-                .repositoryPolicyText(policyObject)
-                .lifecyclePolicy(LifecyclePolicy.builder()
-                        .lifecyclePolicyText("policy")
-                        .registryId("id")
-                        .build())
-                .tags(tags)
-                .arn("arn")
-                .imageTagMutability("IMMUTABLE")
-                .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(false).build())
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =

@@ -1,6 +1,8 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.services.ecr.EcrClient;
+import software.amazon.awssdk.services.ecr.model.EcrException;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
 import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
@@ -239,6 +241,58 @@ public class ReadHandlerTest extends AbstractTestBase {
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(expectedModel);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+        assertThat(response.getNextToken()).isNull();
+    }
+
+    @Test
+    public void handleRequest_AccessDenied() {
+        final EcrException exception = (EcrException) EcrException.builder()
+            .awsErrorDetails(AwsErrorDetails.builder().errorMessage("message").errorCode("AccessDeniedException").build())
+            .build();
+
+        doThrow(exception)
+            .when(proxy)
+            .injectCredentialsAndInvokeV2(any(GetRepositoryPolicyRequest.class), any());
+
+        doThrow(exception)
+            .when(proxy)
+            .injectCredentialsAndInvokeV2(any(GetLifecyclePolicyRequest.class), any());
+
+        doThrow(exception)
+            .when(proxy)
+            .injectCredentialsAndInvokeV2(any(ListTagsForResourceRequest.class), any());
+
+        doReturn(describeRepositoriesResponse)
+            .when(proxy)
+            .injectCredentialsAndInvokeV2(any(DescribeRepositoriesRequest.class), any());
+
+        final ResourceModel model = ResourceModel.builder().build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+            .desiredResourceState(model)
+            .build();
+
+        final ResourceModel expectedModel = ResourceModel.builder()
+            .repositoryName("repo")
+            .repositoryPolicyText(null)
+            .lifecyclePolicy(null)
+            .tags(null)
+            .arn("arn")
+            .imageTagMutability("MUTABLE")
+            .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(true).build())
+            .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

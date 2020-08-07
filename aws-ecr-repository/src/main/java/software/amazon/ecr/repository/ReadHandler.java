@@ -1,5 +1,7 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.EcrException;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -25,6 +27,8 @@ import software.amazon.awssdk.services.ecr.model.RepositoryPolicyNotFoundExcepti
 
 public class ReadHandler extends BaseHandlerStd {
 
+    private static final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
@@ -42,7 +46,7 @@ public class ReadHandler extends BaseHandlerStd {
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
-                .resourceModel(buildModel(proxy, proxyClient, response.repositories().get(0)))
+                .resourceModel(buildModel(proxy, proxyClient, response.repositories().get(0), logger))
                 .status(OperationStatus.SUCCESS)
                 .build();
     }
@@ -56,7 +60,7 @@ public class ReadHandler extends BaseHandlerStd {
         }
     }
 
-    public static ResourceModel buildModel(final AmazonWebServicesClientProxy proxy, final ProxyClient<EcrClient> proxyClient, final Repository repo) {
+    public static ResourceModel buildModel(final AmazonWebServicesClientProxy proxy, final ProxyClient<EcrClient> proxyClient, final Repository repo, final Logger logger) {
         final String arn = repo.repositoryArn();
         final String repositoryName = repo.repositoryName();
         final String registryId = repo.registryId();
@@ -64,12 +68,19 @@ public class ReadHandler extends BaseHandlerStd {
 
         Map<String, Object> repositoryPolicyText = null;
         LifecyclePolicy lifecyclePolicy = null;
+        Set<Tag> tags = null;
 
         try {
             final GetRepositoryPolicyResponse getRepositoryPolicyResponse = proxy.injectCredentialsAndInvokeV2(Translator.getRepositoryPolicyRequest(repositoryName, registryId), client::getRepositoryPolicy);
             repositoryPolicyText = deserializePolicyText(getRepositoryPolicyResponse.policyText());
         } catch (RepositoryPolicyNotFoundException e) {
             // RepositoryPolicyText is not required so it might not exist
+        } catch (EcrException e) {
+            // This is a short term fix for GetAtt backwards compatibility
+            if (!e.awsErrorDetails().errorCode().equals(ACCESS_DENIED_ERROR_CODE)) {
+                throw new CfnGeneralServiceException(e.getMessage(), e);
+            }
+            logger.log(String.format("AccessDenied error: %s for Repository: %s", e.getMessage(), repo.toString()));
         }
 
         try {
@@ -80,10 +91,22 @@ public class ReadHandler extends BaseHandlerStd {
                     .build();
         } catch (LifecyclePolicyNotFoundException e) {
             // LifecyclePolicy is not required so it might not exist
+        } catch (EcrException e) {
+            if (!e.awsErrorDetails().errorCode().equals(ACCESS_DENIED_ERROR_CODE)) {
+                throw new CfnGeneralServiceException(e.getMessage(), e);
+            }
+            logger.log(String.format("AccessDenied error: %s for Repository: %s", e.getMessage(), repo.toString()));
         }
 
-        final ListTagsForResourceResponse listTagsResponse = proxy.injectCredentialsAndInvokeV2(Translator.listTagsForResourceRequest(arn), client::listTagsForResource);
-        final Set<Tag> tags = Translator.translateTagsFromSdk(listTagsResponse.tags());
+        try {
+            final ListTagsForResourceResponse listTagsResponse = proxy.injectCredentialsAndInvokeV2(Translator.listTagsForResourceRequest(arn), client::listTagsForResource);
+            tags = Translator.translateTagsFromSdk(listTagsResponse.tags());
+        } catch (EcrException e) {
+            if (!e.awsErrorDetails().errorCode().equals(ACCESS_DENIED_ERROR_CODE)) {
+                throw new CfnGeneralServiceException(e.getMessage(), e);
+            }
+            logger.log(String.format("AccessDenied error: %s for Repository: %s", e.getMessage(), repo.toString()));
+        }
 
         return ResourceModel.builder()
                 .repositoryName(repositoryName)

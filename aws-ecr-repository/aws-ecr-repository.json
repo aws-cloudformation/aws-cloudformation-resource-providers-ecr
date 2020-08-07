@@ -143,10 +143,7 @@
         },
         "list": {
             "permissions": [
-                "ecr:DescribeRepositories",
-                "ecr:GetLifecyclePolicy",
-                "ecr:GetRepositoryPolicy",
-                "ecr:ListTagsForResource"
+                "ecr:DescribeRepositories"
             ]
         }
     },
