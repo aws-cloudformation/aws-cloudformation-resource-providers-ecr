@@ -1,6 +1,5 @@
 package software.amazon.ecr.repository;
 
-import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;

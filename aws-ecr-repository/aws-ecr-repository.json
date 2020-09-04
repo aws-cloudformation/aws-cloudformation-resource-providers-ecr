@@ -3,6 +3,18 @@
     "description": "The AWS::ECR::Repository resource specifies an Amazon Elastic Container Registry (Amazon ECR) repository, where users can push and pull Docker images. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/Repositories.html",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ecr.git",
     "definitions": {
+        "LifecyclePolicy": {
+            "type": "object",
+            "description": "The LifecyclePolicy property type specifies a lifecycle policy. For information about lifecycle policy syntax, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html",
+            "properties": {
+                "LifecyclePolicyText": {
+                    "$ref": "#/definitions/LifecyclePolicyText"
+                },
+                "RegistryId": {
+                    "$ref": "#/definitions/RegistryId"
+                }
+            }
+        },
         "LifecyclePolicyText": {
             "type": "string",
             "description": "The JSON repository policy text to apply to the repository.",
@@ -45,16 +57,7 @@
     },
     "properties": {
         "LifecyclePolicy": {
-            "type": "object",
-            "description": "The LifecyclePolicy property type specifies a lifecycle policy. For information about lifecycle policy syntax, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html",
-            "properties": {
-                "LifecyclePolicyText": {
-                    "$ref": "#/definitions/LifecyclePolicyText"
-                },
-                "RegistryId": {
-                    "$ref": "#/definitions/RegistryId"
-                }
-            }
+            "$ref": "#/definitions/LifecyclePolicy"
         },
         "RepositoryName": {
             "type": "string",
@@ -64,7 +67,10 @@
             "pattern": "^(?=.{2,256}$)((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)$"
         },
         "RepositoryPolicyText": {
-            "type": "object",
+            "type": [
+                "object",
+                "string"
+            ],
             "description": "The JSON repository policy text to apply to the repository. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/RepositoryPolicyExamples.html in the Amazon Elastic Container Registry User Guide. "
         },
         "Tags": {
