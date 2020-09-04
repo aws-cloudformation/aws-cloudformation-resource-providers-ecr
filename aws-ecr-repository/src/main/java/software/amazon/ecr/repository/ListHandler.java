@@ -11,7 +11,6 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesResponse;
-import static software.amazon.ecr.repository.ReadHandler.buildModel;
 
 public class ListHandler extends BaseHandlerStd {
 
