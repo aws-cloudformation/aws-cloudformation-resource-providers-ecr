@@ -74,7 +74,7 @@ public class Translator {
         try {
             return SetRepositoryPolicyRequest.builder()
                     .repositoryName(model.getRepositoryName())
-                .policyText(translatePolicyInput(model.getRepositoryPolicyText()))
+                    .policyText(translatePolicyInput(model.getRepositoryPolicyText()))
                     .build();
         } catch (final JsonProcessingException e) {
             throw new TerminalException(e);
