@@ -1,8 +1,13 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.ecr.EcrClient;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
+import software.amazon.awssdk.services.ecr.model.InvalidParameterException;
+import software.amazon.awssdk.services.ecr.model.PutLifecyclePolicyRequest;
+import software.amazon.awssdk.services.ecr.model.SetRepositoryPolicyRequest;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -159,5 +164,43 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         assertThrows(ResourceAlreadyExistsException.class,
                 () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger));
+    }
+
+    @Test
+    public void handleRequest_InvalidPolicy() {
+        final ResourceModel model = ResourceModel.builder()
+            .repositoryName("repo")
+            .lifecyclePolicy(LifecyclePolicy.builder().lifecyclePolicyText("policy").build())
+            .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+            .logicalResourceIdentifier("MyResource")
+            .clientRequestToken("token")
+            .desiredResourceState(model)
+            .build();
+
+        doReturn(createRepositoryResponse)
+            .when(proxy)
+            .injectCredentialsAndInvokeV2(any(CreateRepositoryRequest.class), any());
+
+        doThrow(InvalidParameterException.class)
+            .when(proxy)
+            .injectCredentialsAndInvokeV2(any(PutLifecyclePolicyRequest.class), any());
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+            = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
+        assertThat(response.getResourceModel().getArn()).isEqualTo("arn");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getResourceModel().getRepositoryName()).isNotNull();
     }
 }
