@@ -14,7 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#lifecyclepolicy" title="LifecyclePolicy">LifecyclePolicy</a>" : <i><a href="lifecyclepolicy.md">LifecyclePolicy</a></i>,
         "<a href="#repositoryname" title="RepositoryName">RepositoryName</a>" : <i>String</i>,
-        "<a href="#repositorypolicytext" title="RepositoryPolicyText">RepositoryPolicyText</a>" : <i>Map</i>,
+        "<a href="#repositorypolicytext" title="RepositoryPolicyText">RepositoryPolicyText</a>" : <i>Map, String</i>,
         "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
         "<a href="#imagetagmutability" title="ImageTagMutability">ImageTagMutability</a>" : <i>String</i>,
         "<a href="#imagescanningconfiguration" title="ImageScanningConfiguration">ImageScanningConfiguration</a>" : <i><a href="imagescanningconfiguration.md">ImageScanningConfiguration</a></i>
@@ -29,7 +29,7 @@ Type: AWS::ECR::Repository
 Properties:
     <a href="#lifecyclepolicy" title="LifecyclePolicy">LifecyclePolicy</a>: <i><a href="lifecyclepolicy.md">LifecyclePolicy</a></i>
     <a href="#repositoryname" title="RepositoryName">RepositoryName</a>: <i>String</i>
-    <a href="#repositorypolicytext" title="RepositoryPolicyText">RepositoryPolicyText</a>: <i>Map</i>
+    <a href="#repositorypolicytext" title="RepositoryPolicyText">RepositoryPolicyText</a>: <i>Map, String</i>
     <a href="#tags" title="Tags">Tags</a>: <i>
       - <a href="tag.md">Tag</a></i>
     <a href="#imagetagmutability" title="ImageTagMutability">ImageTagMutability</a>: <i>String</i>
@@ -70,7 +70,7 @@ The JSON repository policy text to apply to the repository. For more information
 
 _Required_: No
 
-_Type_: Map
+_Type_: Map, String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

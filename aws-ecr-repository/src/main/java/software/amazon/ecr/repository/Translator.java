@@ -8,7 +8,6 @@ import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
 import software.amazon.awssdk.services.ecr.model.GetLifecyclePolicyRequest;
 import software.amazon.awssdk.services.ecr.model.GetRepositoryPolicyRequest;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
-import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.awssdk.services.ecr.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.ecr.model.PutImageScanningConfigurationRequest;
 import software.amazon.awssdk.services.ecr.model.PutImageTagMutabilityRequest;
@@ -27,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import software.amazon.awssdk.utils.CollectionUtils;
 
 public class Translator {
     public static final ObjectMapper MAPPER = new ObjectMapper();
@@ -65,11 +63,18 @@ public class Translator {
                 .build();
     }
 
+    static String translatePolicyInput(final Object policy) throws JsonProcessingException {
+        if (policy instanceof Map){
+            return MAPPER.writeValueAsString(policy);
+        }
+        return (String)policy;
+    }
+
     static SetRepositoryPolicyRequest setRepositoryPolicyRequest(final ResourceModel model) {
         try {
             return SetRepositoryPolicyRequest.builder()
                     .repositoryName(model.getRepositoryName())
-                    .policyText(MAPPER.writeValueAsString(model.getRepositoryPolicyText()))
+                    .policyText(translatePolicyInput(model.getRepositoryPolicyText()))
                     .build();
         } catch (final JsonProcessingException e) {
             throw new TerminalException(e);
