@@ -1,6 +1,8 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -49,8 +51,17 @@ public class CreateHandler extends BaseHandlerStd {
             throw new ResourceAlreadyExistsException(ResourceModel.TYPE_NAME, model.getRepositoryName());
         }
 
-        if (model.getLifecyclePolicy() != null) proxy.injectCredentialsAndInvokeV2(Translator.putLifecyclePolicyRequest(model), client::putLifecyclePolicy);
-        if (model.getRepositoryPolicyText() != null) proxy.injectCredentialsAndInvokeV2(Translator.setRepositoryPolicyRequest(model), client::setRepositoryPolicy);
+        try {
+            if (model.getLifecyclePolicy() != null) proxy.injectCredentialsAndInvokeV2(Translator.putLifecyclePolicyRequest(model), client::putLifecyclePolicy);
+            if (model.getRepositoryPolicyText() != null) proxy.injectCredentialsAndInvokeV2(Translator.setRepositoryPolicyRequest(model), client::setRepositoryPolicy);
+        } catch (AwsServiceException e) {
+            return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                .resourceModel(model)
+                .status(OperationStatus.FAILED)
+                .errorCode(HandlerErrorCode.GeneralServiceException)
+                .message(e.getMessage())
+                .build();
+        }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
                 .resourceModel(model)
