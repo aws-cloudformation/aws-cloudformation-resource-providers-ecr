@@ -26,9 +26,8 @@ import software.amazon.awssdk.services.ecr.model.TagResourceRequest;
 import software.amazon.awssdk.services.ecr.model.TagResourceResponse;
 import software.amazon.awssdk.services.ecr.model.UntagResourceRequest;
 import software.amazon.awssdk.services.ecr.model.UntagResourceResponse;
-import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -49,14 +48,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateHandlerTest extends AbstractTestBase {
+class UpdateHandlerTest extends AbstractTestBase {
 
     @Mock
     private AmazonWebServicesClientProxy proxy;
@@ -70,7 +67,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     private UpdateHandler handler;
 
 
-    private Repository repo = Repository.builder()
+    private final Repository repo = Repository.builder()
             .repositoryName("repo")
             .registryId("id")
             .repositoryArn("arn")
@@ -80,37 +77,35 @@ public class UpdateHandlerTest extends AbstractTestBase {
                     .build())
             .build();
 
-    private DescribeRepositoriesResponse describeRepositoriesResponse = DescribeRepositoriesResponse.builder()
+    private final DescribeRepositoriesResponse describeRepositoriesResponse = DescribeRepositoriesResponse.builder()
             .repositories(Collections.singletonList(repo))
             .build();
 
-    private ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
+    private final ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
             .tags(Collections.emptyList())
             .build();
 
-    private SetRepositoryPolicyResponse setRepositoryPolicyResponse = SetRepositoryPolicyResponse.builder().build();
-    private PutLifecyclePolicyResponse putLifecyclePolicyResponse = PutLifecyclePolicyResponse.builder().build();
+    private final SetRepositoryPolicyResponse setRepositoryPolicyResponse = SetRepositoryPolicyResponse.builder().build();
+    private final PutLifecyclePolicyResponse putLifecyclePolicyResponse = PutLifecyclePolicyResponse.builder().build();
 
-    private DeleteRepositoryPolicyResponse deleteRepositoryPolicyResponse = DeleteRepositoryPolicyResponse.builder().build();
-    private DeleteLifecyclePolicyResponse deleteLifecyclePolicyResponse = DeleteLifecyclePolicyResponse.builder().build();
+    private final DeleteRepositoryPolicyResponse deleteRepositoryPolicyResponse = DeleteRepositoryPolicyResponse.builder().build();
+    private final DeleteLifecyclePolicyResponse deleteLifecyclePolicyResponse = DeleteLifecyclePolicyResponse.builder().build();
 
-    private UntagResourceResponse untagResourceResponse = UntagResourceResponse.builder().build();
-    private TagResourceResponse tagResourceResponse = TagResourceResponse.builder().build();
+    private final UntagResourceResponse untagResourceResponse = UntagResourceResponse.builder().build();
+    private final TagResourceResponse tagResourceResponse = TagResourceResponse.builder().build();
 
-    private PutImageTagMutabilityResponse putImageTagMutabilityResponse = PutImageTagMutabilityResponse.builder().build();
-    private PutImageScanningConfigurationResponse putImageScanningConfigurationResponse = PutImageScanningConfigurationResponse.builder().build();
+    private final PutImageTagMutabilityResponse putImageTagMutabilityResponse = PutImageTagMutabilityResponse.builder().build();
+    private final PutImageScanningConfigurationResponse putImageScanningConfigurationResponse = PutImageScanningConfigurationResponse.builder().build();
 
 
     @BeforeEach
     public void setup() {
         handler = new UpdateHandler();
-        ecr = mock(EcrClient.class);
-        proxy = mock(AmazonWebServicesClientProxy.class);
         proxyEcrClient = MOCK_PROXY(proxy, ecr);
     }
 
     @Test
-    public void handleRequest_SimpleSuccess() {
+    void handleRequest_SimpleSuccess() {
         final List<software.amazon.awssdk.services.ecr.model.Tag> existingTags = ImmutableList.of(
                 software.amazon.awssdk.services.ecr.model.Tag.builder().key("key1").value("val1").build(),
                 software.amazon.awssdk.services.ecr.model.Tag.builder().key("key2").value("val2").build()
@@ -163,7 +158,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
-        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getCallbackDelaySeconds()).isZero();
         assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
@@ -171,7 +166,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_RemoveProperties() {
+    void handleRequest_RemoveProperties() {
         doReturn(deleteRepositoryPolicyResponse).when(proxy).injectCredentialsAndInvokeV2(any(DeleteRepositoryPolicyRequest.class), any());
         doReturn(deleteLifecyclePolicyResponse).when(proxy).injectCredentialsAndInvokeV2(any(DeleteLifecyclePolicyRequest.class), any());
         doReturn(describeRepositoriesResponse).when(proxy).injectCredentialsAndInvokeV2(any(DescribeRepositoriesRequest.class), any());
@@ -191,7 +186,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
-        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getCallbackDelaySeconds()).isZero();
         assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
@@ -199,7 +194,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_PoliciesAlreadyDeleted() {
+    void handleRequest_PoliciesAlreadyDeleted() {
         doReturn(describeRepositoriesResponse)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(DescribeRepositoriesRequest.class), any());
@@ -227,7 +222,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
-        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getCallbackDelaySeconds()).isZero();
         assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
@@ -235,7 +230,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_RepoNotFound() {
+    void handleRequest_RepoNotFound() {
         doThrow(RepositoryNotFoundException.class)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(ArgumentMatchers.any(), ArgumentMatchers.any());
@@ -248,7 +243,11 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger));
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler
+                .handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
     }
 }

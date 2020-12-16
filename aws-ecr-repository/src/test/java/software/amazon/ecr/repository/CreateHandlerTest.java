@@ -1,11 +1,9 @@
 package software.amazon.ecr.repository;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.ecr.EcrClient;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
 import software.amazon.awssdk.services.ecr.model.InvalidParameterException;
 import software.amazon.awssdk.services.ecr.model.PutLifecyclePolicyRequest;
-import software.amazon.awssdk.services.ecr.model.SetRepositoryPolicyRequest;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;

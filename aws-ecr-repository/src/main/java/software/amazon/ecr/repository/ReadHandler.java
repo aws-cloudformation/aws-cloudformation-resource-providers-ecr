@@ -5,6 +5,7 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -42,7 +43,10 @@ public class ReadHandler extends BaseHandlerStd {
         try {
             response = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), proxyClient.client()::describeRepositories);
         } catch (RepositoryNotFoundException e) {
-            throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());
+            return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                    .errorCode(HandlerErrorCode.NotFound)
+                    .status(OperationStatus.FAILED)
+                    .build();
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()

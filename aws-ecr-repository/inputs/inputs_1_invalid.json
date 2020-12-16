@@ -1,0 +1,16 @@
+{
+  "RepositoryName" : "my-testing-inputs-repo",
+  "RepositoryPolicyText" : {
+    "Version" : "2008-10-17",
+    "Statement": [ {
+      "Sid": "new statement",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action" :"ecr-public:*"
+    }
+    ]
+  },
+  "ImageTagMutability": "INVALID"
+}
