@@ -1,7 +1,7 @@
 package software.amazon.ecr.repository;
 
-import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -72,7 +72,11 @@ public class UpdateHandler extends BaseHandlerStd {
             model.setArn(arn);
             handleTagging(request.getDesiredResourceTags(), arn);
         } catch (RepositoryNotFoundException e) {
-            throw new ResourceNotFoundException(ResourceModel.TYPE_NAME, model.getRepositoryName());
+            return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                    .errorCode(HandlerErrorCode.NotFound)
+                    .status(OperationStatus.FAILED)
+                    .message(e.getMessage())
+                    .build();
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()

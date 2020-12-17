@@ -5,9 +5,8 @@ import software.amazon.awssdk.services.ecr.EcrClient;
 import software.amazon.awssdk.services.ecr.model.EcrException;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
 import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
-import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -36,14 +35,13 @@ import software.amazon.awssdk.services.ecr.model.RepositoryNotFoundException;
 import software.amazon.awssdk.services.ecr.model.RepositoryPolicyNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-public class ReadHandlerTest extends AbstractTestBase {
+class ReadHandlerTest extends AbstractTestBase {
 
     @Mock
     private AmazonWebServicesClientProxy proxy;
@@ -56,7 +54,7 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     private ReadHandler handler;
 
-    private Repository repository = Repository.builder()
+    private final Repository repository = Repository.builder()
             .repositoryName("repo")
             .registryId("id")
             .repositoryArn("arn")
@@ -64,23 +62,23 @@ public class ReadHandlerTest extends AbstractTestBase {
             .imageTagMutability(ImageTagMutability.MUTABLE)
             .build();
 
-    private DescribeRepositoriesResponse describeRepositoriesResponse = DescribeRepositoriesResponse.builder()
+    private final DescribeRepositoriesResponse describeRepositoriesResponse = DescribeRepositoriesResponse.builder()
             .repositories(Collections.singletonList(repository))
             .build();
 
-    private GetLifecyclePolicyResponse getLifecyclePolicyResponse = GetLifecyclePolicyResponse.builder()
+    private final GetLifecyclePolicyResponse getLifecyclePolicyResponse = GetLifecyclePolicyResponse.builder()
             .repositoryName("repo")
             .lifecyclePolicyText("policy")
             .registryId("id")
             .build();
 
-    private GetRepositoryPolicyResponse getRepositoryPolicyResponse = GetRepositoryPolicyResponse.builder()
+    private final GetRepositoryPolicyResponse getRepositoryPolicyResponse = GetRepositoryPolicyResponse.builder()
             .repositoryName("repo")
             .policyText("{\"foo\": \"bar\"}")
             .registryId("id")
             .build();
 
-    private ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
+    private final ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
             .tags(Collections.singletonList(software.amazon.awssdk.services.ecr.model.Tag.builder().key("key").value("value").build()))
             .build();
 
@@ -93,7 +91,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_SimpleSuccess() {
+    void handleRequest_SimpleSuccess() {
         doReturn(describeRepositoriesResponse,
                 getRepositoryPolicyResponse,
                 getLifecyclePolicyResponse,
@@ -131,7 +129,7 @@ public class ReadHandlerTest extends AbstractTestBase {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
-        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getCallbackDelaySeconds()).isZero();
         assertThat(response.getResourceModel()).isEqualTo(expectedModel);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
@@ -140,7 +138,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_PoliciesNotFound() {
+    void handleRequest_PoliciesNotFound() {
         doThrow(RepositoryPolicyNotFoundException.class)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(GetRepositoryPolicyRequest.class), any());
@@ -181,7 +179,7 @@ public class ReadHandlerTest extends AbstractTestBase {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
-        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getCallbackDelaySeconds()).isZero();
         assertThat(response.getResourceModel()).isEqualTo(expectedModel);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
@@ -190,7 +188,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_RepoNotFound() {
+    void handleRequest_RepoNotFound() {
         doThrow(RepositoryNotFoundException.class)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(ArgumentMatchers.any(), ArgumentMatchers.any());
@@ -201,12 +199,16 @@ public class ReadHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger));
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler
+                .handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
     }
 
     @Test
-    public void handleRequest_NullRepositoryPolicyText() {
+    void handleRequest_NullRepositoryPolicyText() {
         final GetRepositoryPolicyResponse getRepositoryPolicyResponse = GetRepositoryPolicyResponse.builder()
                 .repositoryName("repo")
                 .registryId("id")
@@ -254,7 +256,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_AccessDenied() {
+    void handleRequest_AccessDenied() {
         final EcrException exception = (EcrException) EcrException.builder()
             .awsErrorDetails(AwsErrorDetails.builder().errorMessage("message").errorCode("AccessDeniedException").build())
             .build();
@@ -297,7 +299,7 @@ public class ReadHandlerTest extends AbstractTestBase {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
-        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getCallbackDelaySeconds()).isZero();
         assertThat(response.getResourceModel()).isEqualTo(expectedModel);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();

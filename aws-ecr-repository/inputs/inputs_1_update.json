@@ -1,0 +1,8 @@
+{
+    "RepositoryName": "my-testing-inputs-repo",
+    "Tags": [],
+    "ImageTagMutability": "MUTABLE",
+    "ImageScanningConfiguration": {
+        "ScanOnPush": true
+    }
+}
