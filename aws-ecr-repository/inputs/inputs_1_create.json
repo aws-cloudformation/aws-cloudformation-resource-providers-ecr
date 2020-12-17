@@ -1,9 +1,8 @@
 {
-  "RepositoryName": "my-testing-inputs-repo",
-  "Tags": [],
-  "ImageTagMutability": "MUTABLE",
-  "ImageScanningConfiguration":
-    {
-      "ScanOnPush": false
+    "RepositoryName": "my-testing-inputs-repo",
+    "Tags": [],
+    "ImageTagMutability": "MUTABLE",
+    "ImageScanningConfiguration": {
+        "ScanOnPush": false
     }
 }
