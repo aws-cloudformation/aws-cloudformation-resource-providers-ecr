@@ -1,0 +1,14 @@
+{
+    "ReplicationConfiguration": {
+        "Rules": [
+            {
+                "Destinations": [
+                    {
+                        "Region": "us-unkown-1",
+                        "RegistryId": "999999999999"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "ReplicationConfiguration": {
+        "Rules": [
+            {
+                "Destinations": [
+                    {
+                        "Region": "us-east-2",
+                        "RegistryId": "999999999999"
+                    },
+                    {
+                        "Region": "us-east-2",
+                        "RegistryId": "888888888888"
+                    }
+                ]
+            }
+        ]
+    }
+}
