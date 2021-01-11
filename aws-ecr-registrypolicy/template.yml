@@ -21,4 +21,3 @@ Resources:
       Handler: software.amazon.ecr.registrypolicy.HandlerWrapper::testEntrypoint
       Runtime: java8
       CodeUri: ./target/aws-ecr-registrypolicy-handler-1.0-SNAPSHOT.jar
-

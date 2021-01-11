@@ -1,14 +1,14 @@
 {
     "PolicyText": {
-        "Version":"2012-10-17",
-        "Statement":[
+        "Version": "2012-10-17",
+        "Statement": [
             {
-                "Sid":"ReplicationAccessCrossAccount",
-                "Effect":"Allow",
-                "Principal":{
-                    "AWS":"arn:aws:iam::111111:root"
+                "Sid": "ReplicationAccessCrossAccount",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::111111:root"
                 },
-                "Action":[
+                "Action": [
                     "ecr:CreateRepository",
                     "ecr:ReplicateImage"
                 ],

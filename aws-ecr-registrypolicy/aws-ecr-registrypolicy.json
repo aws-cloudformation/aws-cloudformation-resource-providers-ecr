@@ -25,7 +25,7 @@
             "$ref": "#/definitions/RegistryId"
         },
         "PolicyText": {
-            "$ref" : "#/definitions/PolicyText"
+            "$ref": "#/definitions/PolicyText"
         }
     },
     "required": [
