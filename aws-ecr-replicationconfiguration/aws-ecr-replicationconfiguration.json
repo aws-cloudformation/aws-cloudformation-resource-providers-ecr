@@ -63,7 +63,7 @@
         "Region": {
             "description": "A Region to replicate to.",
             "type": "string",
-            "pattern": "[0-z9a-z-]{2,25}"
+            "pattern": "[0-9a-z-]{2,25}"
         }
     },
     "properties": {
