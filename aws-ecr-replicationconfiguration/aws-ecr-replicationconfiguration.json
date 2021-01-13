@@ -10,7 +10,10 @@
             "items": {
                 "$ref": "#/definitions/ReplicationRule"
             },
-            "description": "An array of objects representing the replication rules for a replication configuration. A replication configuration may contain only one replication rule but the rule may contain one or more replication destinations."
+            "description": "An array of objects representing the replication rules for a replication configuration. A replication configuration may contain only one replication rule but the rule may contain one or more replication destinations.",
+            "required": [
+                "ReplicationRule"
+            ]
         },
         "ReplicationRule": {
             "type": "object",
@@ -19,7 +22,10 @@
                     "$ref": "#/definitions/Destinations"
                 }
             },
-            "description": "An array of objects representing the details of a replication destination."
+            "description": "An array of objects representing the details of a replication destination.",
+            "required": [
+                "Destinations"
+            ]
         },
         "Destinations": {
             "type": "array",
@@ -28,7 +34,10 @@
             "items": {
                 "$ref": "#/definitions/ReplicationDestination"
             },
-            "description": "An array of objects representing the details of a replication destination."
+            "description": "An array of objects representing the details of a replication destination.",
+            "required": [
+                "ReplicationDestination"
+            ]
         },
         "ReplicationDestination": {
             "type": "object",
@@ -65,7 +74,10 @@
                     "$ref": "#/definitions/Rules"
                 }
             },
-            "description": "An object representing the replication configuration for a registry."
+            "description": "An object representing the replication configuration for a registry.",
+            "required": [
+                "Rules"
+            ]
         },
         "RegistryId": {
             "type": "string",

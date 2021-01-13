@@ -27,7 +27,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 An array of objects representing the details of a replication destination.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: List of <a href="replicationdestination.md">ReplicationDestination</a>
 

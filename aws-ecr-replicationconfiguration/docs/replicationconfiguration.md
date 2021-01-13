@@ -27,7 +27,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 An array of objects representing the replication rules for a replication configuration. A replication configuration may contain only one replication rule but the rule may contain one or more replication destinations.
 
-_Required_: No
+_Required_: Yes
 
 _Type_: List of <a href="replicationrule.md">ReplicationRule</a>
 
