@@ -12,7 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "AWS::ECR::RegistryPolicy",
     "Properties" : {
-        "<a href="#policytext" title="PolicyText">PolicyText</a>" : <i>Map, String</i>
+        "<a href="#policytext" title="PolicyText">PolicyText</a>" : <i>Map</i>
     }
 }
 </pre>
@@ -22,7 +22,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: AWS::ECR::RegistryPolicy
 Properties:
-    <a href="#policytext" title="PolicyText">PolicyText</a>: <i>Map, String</i>
+    <a href="#policytext" title="PolicyText">PolicyText</a>: <i>Map</i>
 </pre>
 
 ## Properties
@@ -33,9 +33,7 @@ The JSON policy text to apply to your registry. The policy text follows the same
 
 _Required_: Yes
 
-_Type_: Map, String
-
-_Maximum_: <code>10240</code>
+_Type_: Map
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

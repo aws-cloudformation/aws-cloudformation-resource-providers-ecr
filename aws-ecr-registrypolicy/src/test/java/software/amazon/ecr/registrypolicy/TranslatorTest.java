@@ -21,11 +21,11 @@ class TranslatorTest extends AbstractTestBase {
     @Test
     void translateToPutRequest_success() {
         ResourceModel model = ResourceModel.builder()
-                .policyText(REGISTRY_POLICY_INPUT_TEXT)
+                .policyText(REGISTRY_POLICY_INPUT)
                 .registryId(TEST_REGISTRY_ID)
                 .build();
         PutRegistryPolicyRequest translatedRequest = Translator.translateToPutRequest(model);
-        assertThat(translatedRequest.policyText()).isEqualTo(model.getPolicyText());
+        assertThat(translatedRequest.policyText()).isEqualTo(REGISTRY_POLICY_INPUT_TEXT);
     }
 
     @Test

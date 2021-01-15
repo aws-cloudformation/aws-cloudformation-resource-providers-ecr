@@ -49,7 +49,7 @@ class CreateHandlerTest extends software.amazon.ecr.registrypolicy.AbstractTestB
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         model = ResourceModel.builder()
-                .policyText(REGISTRY_POLICY_INPUT_TEXT)
+                .policyText(REGISTRY_POLICY_INPUT)
                 .registryId(TEST_REGISTRY_ID)
                 .build();
         handler = new software.amazon.ecr.registrypolicy.CreateHandler();
