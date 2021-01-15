@@ -1,7 +1,15 @@
 package software.amazon.ecr.registrypolicy;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import org.json.JSONObject;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.core.ResponseBytes;
@@ -16,6 +24,7 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 public class AbstractTestBase {
   protected static final Credentials MOCK_CREDENTIALS;
   protected static final LoggerProxy logger;
+  protected static final Map<String, Object> REGISTRY_POLICY_INPUT;
 
   static final String TEST_REGISTRY_ID = "12345";
   static final String REGISTRY_POLICY_INPUT_TEXT =  "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ReplicationAccessCrossAccount\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123412341234:root\"},\"Action\":[\"ecr:CreateRepository\",\"ecr:ReplicateImage\"],\"Resource\":\"arn:aws:ecr:us-west-2:123456123456:repository\"}]}";
@@ -24,7 +33,10 @@ public class AbstractTestBase {
   static {
     MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
     logger = new LoggerProxy();
+    REGISTRY_POLICY_INPUT = new Gson().fromJson(REGISTRY_POLICY_INPUT_TEXT, new TypeToken<Map<String, Object>>() {}.getType());
+
   }
+
   static ProxyClient<EcrClient> MOCK_PROXY(
           final AmazonWebServicesClientProxy proxy,
           final EcrClient sdkClient) {

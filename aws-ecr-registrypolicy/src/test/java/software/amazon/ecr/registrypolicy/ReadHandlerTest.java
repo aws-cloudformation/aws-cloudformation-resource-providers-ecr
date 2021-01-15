@@ -45,7 +45,7 @@ class ReadHandlerTest extends AbstractTestBase {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         model = ResourceModel.builder()
                 .registryId(TEST_REGISTRY_ID)
-                .policyText(REGISTRY_POLICY_INPUT_TEXT)
+                .policyText(REGISTRY_POLICY_INPUT)
                 .build();
 
         handler = new ReadHandler();
