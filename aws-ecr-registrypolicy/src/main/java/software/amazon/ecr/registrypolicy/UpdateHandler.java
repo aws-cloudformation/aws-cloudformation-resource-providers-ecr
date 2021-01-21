@@ -57,12 +57,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 proxy.initiate("AWS-ECR-RegistryPolicy::PreUpdateCheck", proxyClient, request.getDesiredResourceState(),
                         progressEvent.getCallbackContext())
                     .translateToServiceRequest(Translator::translateToReadRequest)
-                    .makeServiceCall((awsRequest, client) -> {
-                        GetRegistryPolicyResponse response = proxy.injectCredentialsAndInvokeV2(awsRequest,
-                            proxyClient.client()::getRegistryPolicy);
-                        logger.log(ResourceModel.TYPE_NAME + " has successfully been read.");
-                        return response;
-                    })
+                    .makeServiceCall((awsRequest, client) -> getRegistryPolicy(awsRequest, client, proxy, logger))
                     .handleError((awsRequest, exception, client, model, context) ->
                         this.handleError(exception, model, context))
                     .progress()
