@@ -2,6 +2,8 @@ package software.amazon.ecr.registrypolicy;
 
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.ecr.EcrClient;
+import software.amazon.awssdk.services.ecr.model.GetRegistryPolicyRequest;
+import software.amazon.awssdk.services.ecr.model.GetRegistryPolicyResponse;
 import software.amazon.awssdk.services.ecr.model.InvalidParameterException;
 import software.amazon.awssdk.services.ecr.model.RegistryPolicyNotFoundException;
 import software.amazon.awssdk.services.ecr.model.ValidationException;
@@ -33,6 +35,16 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
       logger
     );
   }
+
+ GetRegistryPolicyResponse getRegistryPolicy(GetRegistryPolicyRequest request,
+         ProxyClient<EcrClient> proxyClient,
+         AmazonWebServicesClientProxy proxy,
+         Logger logger) {
+   GetRegistryPolicyResponse response = proxy.injectCredentialsAndInvokeV2(request,
+           proxyClient.client()::getRegistryPolicy);
+   logger.log(ResourceModel.TYPE_NAME + " has successfully been read.");
+   return response;
+ }
 
   protected ProgressEvent<ResourceModel, CallbackContext> handleError(
           final Exception e,

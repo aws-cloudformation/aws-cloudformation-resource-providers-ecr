@@ -1,7 +1,6 @@
 package software.amazon.ecr.registrypolicy;
 
 import software.amazon.awssdk.services.ecr.EcrClient;
-import software.amazon.awssdk.services.ecr.model.GetRegistryPolicyResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -21,19 +20,10 @@ public class ReadHandler extends BaseHandlerStd {
             .initiate("AWS-ECR-RegistryPolicy::Read", proxyClient, request.getDesiredResourceState(),
                     callbackContext)
             .translateToServiceRequest(Translator::translateToReadRequest)
-            .makeServiceCall((awsRequest, client) -> {
-                GetRegistryPolicyResponse response = proxy.injectCredentialsAndInvokeV2(awsRequest,
-                        proxyClient.client()::getRegistryPolicy);
-                logger.log(ResourceModel.TYPE_NAME + " has successfully been read.");
-                return response;
-            })
+            .makeServiceCall((awsRequest, client) -> getRegistryPolicy(awsRequest, client, proxy, logger))
             .handleError((awsRequest, exception, client, model, context) ->
                     this.handleError(exception, model, context))
-            .done(awsResponse -> {
-                    return ProgressEvent.defaultSuccessHandler(
-                            Translator.translateFromReadResponse(awsResponse));
-            });
+            .done(awsResponse -> ProgressEvent.defaultSuccessHandler(
+                    Translator.translateFromReadResponse(awsResponse)));
         }
-
-
 }
