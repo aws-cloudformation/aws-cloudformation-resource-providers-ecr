@@ -35,6 +35,7 @@ public class UpdateHandler extends BaseHandlerStd {
 
         final ResourceModel model = request.getDesiredResourceState();
         final String accountId = request.getAwsAccountId();
+        final String repositoryName = model.getRepositoryName();
         this.client = proxyClient.client();
         this.proxy = proxy;
 
@@ -43,6 +44,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 proxy.injectCredentialsAndInvokeV2(Translator.setRepositoryPolicyRequest(model), client::setRepositoryPolicy);
             } else {
                 try {
+                    proxy.injectCredentialsAndInvokeV2(Translator.getRepositoryPolicyRequest(repositoryName, accountId), client::getRepositoryPolicy);
                     proxy.injectCredentialsAndInvokeV2(Translator.deleteRepositoryPolicyRequest(model), client::deleteRepositoryPolicy);
                 } catch (RepositoryPolicyNotFoundException e) {
                     // there's no policy to delete
@@ -53,6 +55,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 proxy.injectCredentialsAndInvokeV2(Translator.putLifecyclePolicyRequest(model), client::putLifecyclePolicy);
             } else {
                 try {
+                    proxy.injectCredentialsAndInvokeV2(Translator.getLifecyclePolicyRequest(repositoryName, accountId), client::getLifecyclePolicy);
                     proxy.injectCredentialsAndInvokeV2(Translator.deleteLifecyclePolicyRequest(model), client::deleteLifecyclePolicy);
                 } catch (LifecyclePolicyNotFoundException e) {
                     // there's no policy to delete
