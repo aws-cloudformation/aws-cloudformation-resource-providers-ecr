@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -119,11 +120,19 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_AutogenerateName() {
+        String stackName = "TestStack";
+        String stackId = String.join("/",
+                "arn:aws:cloudformation:us-west-2:123123123123:stack",
+                stackName,
+                UUID.randomUUID().toString());
+        String resourceId = "MyResource";
+
         final ResourceModel model = ResourceModel.builder()
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .logicalResourceIdentifier("MyResource")
+                .stackId(stackId)
+                .logicalResourceIdentifier(resourceId)
                 .clientRequestToken("token")
                 .desiredResourceState(model)
                 .build();
@@ -143,7 +152,8 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
-        assertThat(response.getResourceModel().getRepositoryName()).isNotNull();
+        String repositoryName = String.join("-", stackName, resourceId).toLowerCase();
+        assertThat(response.getResourceModel().getRepositoryName()).startsWith(repositoryName);
     }
 
     @Test
