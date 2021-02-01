@@ -8,6 +8,7 @@ import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
@@ -26,10 +27,11 @@ public class CreateHandler extends BaseHandlerStd {
         final ProxyClient<EcrClient> proxyClient,
         final Logger logger) {
 
-        return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
+        ResourceModel model = request.getDesiredResourceState();
+        model.setRegistryId(request.getAwsAccountId());
+        return ProgressEvent.progress(model, callbackContext)
             .then(progress -> checkForPreCreateResourceExistence(proxy, proxyClient, progress, logger))
-            .then(progress -> createResource(proxy, proxyClient, progress, logger))
-            .then(progress -> verifyResourceExistence(proxy, proxyClient, progress, logger));
+            .then(progress -> createResource(proxy, proxyClient, progress, logger));
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> checkForPreCreateResourceExistence(
@@ -83,23 +85,10 @@ public class CreateHandler extends BaseHandlerStd {
                         })
                         .handleError((awsRequest, exception, client, model, context) ->
                                 this.handleError(exception, model,context))
-                        .progress()
+                        .done(awsResponse -> ProgressEvent.<ResourceModel, CallbackContext>builder()
+                                .status(OperationStatus.SUCCESS)
+                                .resourceModel(progress.getResourceModel())
+                                .build())
         );
-    }
-
-    private ProgressEvent<ResourceModel, CallbackContext> verifyResourceExistence(
-            final AmazonWebServicesClientProxy proxy,
-            final ProxyClient<EcrClient> proxyClient,
-            final ProgressEvent<ResourceModel, CallbackContext> progressEvent,
-            final Logger logger) {
-        return progressEvent.then(progress ->
-                proxy.initiate("AWS-ECR-RegistryPolicy::PostCreateCheck", proxyClient, progress.getResourceModel(),
-                        progressEvent.getCallbackContext())
-                        .translateToServiceRequest(Translator::translateToReadRequest)
-                        .makeServiceCall((awsRequest, client) -> getRegistryPolicy(awsRequest, client, proxy, logger))
-                        .handleError((awsRequest, exception, client, model, context) ->
-                                this.handleError(exception, model, context))
-                        .done(awsResponse -> ProgressEvent.defaultSuccessHandler(
-                                Translator.translateFromReadResponse(awsResponse))));
     }
 }

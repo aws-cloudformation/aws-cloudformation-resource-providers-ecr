@@ -56,11 +56,7 @@ class CreateHandlerTest extends software.amazon.ecr.registrypolicy.AbstractTestB
 
         when(proxyClientMock.client()).thenReturn(ecrMock);
         when(ecrMock.getRegistryPolicy(any(GetRegistryPolicyRequest.class)))
-                .thenThrow(RegistryPolicyNotFoundException.builder().build())
-                .thenReturn(GetRegistryPolicyResponse.builder()
-                        .registryId(TEST_REGISTRY_ID)
-                        .policyText(REGISTRY_POLICY_OUTPUT_TEXT)
-                        .build());
+                .thenThrow(RegistryPolicyNotFoundException.builder().build());
     }
 
     @AfterEach
@@ -85,7 +81,7 @@ class CreateHandlerTest extends software.amazon.ecr.registrypolicy.AbstractTestB
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
-        verify(ecrMock, times(2)).getRegistryPolicy(any(GetRegistryPolicyRequest.class));
+        verify(ecrMock, times(1)).getRegistryPolicy(any(GetRegistryPolicyRequest.class));
     }
 
     @Test
