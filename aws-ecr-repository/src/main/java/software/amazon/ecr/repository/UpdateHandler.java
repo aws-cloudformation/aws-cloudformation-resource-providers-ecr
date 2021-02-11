@@ -71,6 +71,7 @@ public class UpdateHandler extends BaseHandlerStd {
             final String arn = describeResponse.repositories().get(0).repositoryArn();
             model.setArn(arn);
             handleTagging(request.getDesiredResourceTags(), arn);
+            logger.log(String.format("%s [%s] Update Successful", ResourceModel.TYPE_NAME, model.getRepositoryName()));
         } catch (RepositoryNotFoundException e) {
             return ProgressEvent.<ResourceModel, CallbackContext>builder()
                     .errorCode(HandlerErrorCode.NotFound)

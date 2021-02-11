@@ -42,6 +42,7 @@ public class ReadHandler extends BaseHandlerStd {
 
         try {
             response = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), proxyClient.client()::describeRepositories);
+            logger.log(String.format("%s [%s] Read Successful", ResourceModel.TYPE_NAME, model.getRepositoryName()));
         } catch (RepositoryNotFoundException e) {
             return ProgressEvent.<ResourceModel, CallbackContext>builder()
                     .errorCode(HandlerErrorCode.NotFound)

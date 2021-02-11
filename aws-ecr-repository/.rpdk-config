@@ -1,9 +1,10 @@
 {
+    "artifact_type": "RESOURCE",
     "typeName": "AWS::ECR::Repository",
     "language": "java",
     "runtime": "java8",
     "entrypoint": "software.amazon.ecr.repository.HandlerWrapper::handleRequest",
-    "testEntrypoint": "software.amazon.ecr.repository.HandlerWrapper::testEntrypoint",
+    "testEntrypoint": "software.amazon.ecr.repository.HandlerWrapper::handleRequest",
     "settings": {
         "namespace": [
             "software",
@@ -12,5 +13,6 @@
             "repository"
         ],
         "protocolVersion": "2.0.0"
-    }
+    },
+    "executableEntrypoint": "software.amazon.ecr.repository.HandlerWrapperExecutable"
 }
