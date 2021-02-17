@@ -32,6 +32,7 @@ public class CreateHandler extends BaseHandlerStd {
         if (StringUtils.isNullOrEmpty(model.getRepositoryName())) {
             model.setRepositoryName(
                     IdentifierUtils.generateResourceIdentifier(
+                            request.getStackId(),
                             request.getLogicalResourceIdentifier(),
                             request.getClientRequestToken(),
                             MAX_REPO_NAME_LENGTH
