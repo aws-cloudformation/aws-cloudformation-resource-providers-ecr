@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ConfigurationTest {
 
     @Test
-    void testMergeDuplicateKeys() {
+    void tagConfigurationWithKeyCollision_Success() {
         final ResourceModel model = ResourceModel.builder()
                 .tags(ImmutableSet.of(new Tag("key1", "value0"), new Tag("key1", "value1"), new Tag("key2", "value2")))
                 .build();

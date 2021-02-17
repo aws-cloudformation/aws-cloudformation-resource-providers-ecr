@@ -66,7 +66,7 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 #### RepositoryPolicyText
 
-The JSON repository policy text to apply to the repository. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/RepositoryPolicyExamples.html in the Amazon Elastic Container Registry User Guide.
+The JSON repository policy text to apply to the repository. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/RepositoryPolicyExamples.html in the Amazon Elastic Container Registry User Guide. 
 
 _Required_: No
 
@@ -121,3 +121,4 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### Arn
 
 Returns the <code>Arn</code> value.
+

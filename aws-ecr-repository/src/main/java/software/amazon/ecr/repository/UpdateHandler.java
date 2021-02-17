@@ -44,6 +44,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 proxy.injectCredentialsAndInvokeV2(Translator.setRepositoryPolicyRequest(model), client::setRepositoryPolicy);
             } else {
                 try {
+                    // Read call is necessary to avoid exception during update if role does not have DeleteRepositoryPolicy permission.
                     proxy.injectCredentialsAndInvokeV2(Translator.getRepositoryPolicyRequest(repositoryName, accountId), client::getRepositoryPolicy);
                     proxy.injectCredentialsAndInvokeV2(Translator.deleteRepositoryPolicyRequest(model), client::deleteRepositoryPolicy);
                 } catch (RepositoryPolicyNotFoundException e) {
@@ -55,6 +56,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 proxy.injectCredentialsAndInvokeV2(Translator.putLifecyclePolicyRequest(model), client::putLifecyclePolicy);
             } else {
                 try {
+                    // Read call is necessary to avoid exception during update if role does not have DeleteLifecyclePolicy permission.
                     proxy.injectCredentialsAndInvokeV2(Translator.getLifecyclePolicyRequest(repositoryName, accountId), client::getLifecyclePolicy);
                     proxy.injectCredentialsAndInvokeV2(Translator.deleteLifecyclePolicyRequest(model), client::deleteLifecyclePolicy);
                 } catch (LifecyclePolicyNotFoundException e) {

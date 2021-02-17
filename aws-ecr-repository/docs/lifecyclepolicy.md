@@ -40,7 +40,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### RegistryId
 
-The AWS account ID associated with the registry that contains the repository. If you do not specify a registry, the default registry is assumed.
+The AWS account ID associated with the registry that contains the repository. If you do not specify a registry, the default registry is assumed. 
 
 _Required_: No
 
@@ -53,3 +53,4 @@ _Maximum_: <code>12</code>
 _Pattern_: <code>^[0-9]{12}$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
