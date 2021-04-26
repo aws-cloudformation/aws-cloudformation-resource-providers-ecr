@@ -5,6 +5,7 @@ import software.amazon.awssdk.services.ecr.model.DeleteLifecyclePolicyRequest;
 import software.amazon.awssdk.services.ecr.model.DeleteRepositoryPolicyRequest;
 import software.amazon.awssdk.services.ecr.model.DeleteRepositoryRequest;
 import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
+import software.amazon.awssdk.services.ecr.model.EncryptionConfiguration;
 import software.amazon.awssdk.services.ecr.model.GetLifecyclePolicyRequest;
 import software.amazon.awssdk.services.ecr.model.GetRepositoryPolicyRequest;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
@@ -44,6 +45,15 @@ public class Translator {
 
         if (model.getImageTagMutability() != null) {
             createRepositoryRequest.imageTagMutability(model.getImageTagMutability());
+        }
+
+        if (model.getEncryptionConfiguration() != null) {
+            EncryptionConfiguration.Builder encryptionConfigurationBuilder = EncryptionConfiguration.builder()
+                    .encryptionType(model.getEncryptionConfiguration().getEncryptionType());
+            if (model.getEncryptionConfiguration().getKmsKey() != null) {
+                encryptionConfigurationBuilder.kmsKey(model.getEncryptionConfiguration().getKmsKey());
+            }
+            createRepositoryRequest.encryptionConfiguration(encryptionConfigurationBuilder.build());
         }
 
         return createRepositoryRequest.build();

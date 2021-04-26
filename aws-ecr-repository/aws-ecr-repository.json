@@ -55,6 +55,20 @@
         "ScanOnPush": {
             "type": "boolean",
             "description": "The setting that determines whether images are scanned after being pushed to a repository."
+        },
+        "EncryptionType": {
+            "type": "string",
+            "description": "The encryption type to use.",
+            "enum": [
+                "AES256",
+                "KMS"
+            ]
+        },
+        "KmsKey": {
+            "type": "string",
+            "description": "If you use the KMS encryption type, specify the CMK to use for encryption. The alias, key ID, or full ARN of the CMK can be specified. The key must exist in the same Region as the repository. If no key is specified, the default AWS managed CMK for Amazon ECR will be used.",
+            "minLength": 1,
+            "maxLength": 2048
         }
     },
     "properties": {
@@ -105,10 +119,29 @@
                 }
             },
             "additionalProperties": false
+        },
+        "EncryptionConfiguration": {
+            "type": "object",
+            "description": "The encryption configuration for the repository. This determines how the contents of your repository are encrypted at rest.\n\nBy default, when no encryption configuration is set or the AES256 encryption type is used, Amazon ECR uses server-side encryption with Amazon S3-managed encryption keys which encrypts your data at rest using an AES-256 encryption algorithm. This does not require any action on your part.\n\nFor more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/encryption-at-rest.html",
+            "properties": {
+                "EncryptionType": {
+                    "$ref": "#/definitions/EncryptionType"
+                },
+                "KmsKey": {
+                    "$ref": "#/definitions/KmsKey"
+                }
+            },
+            "required": [
+                "EncryptionType"
+            ],
+            "additionalProperties": false
         }
     },
     "createOnlyProperties": [
-        "/properties/RepositoryName"
+        "/properties/RepositoryName",
+        "/properties/EncryptionConfiguration",
+        "/properties/EncryptionConfiguration/EncryptionType",
+        "/properties/EncryptionConfiguration/KmsKey"
     ],
     "readOnlyProperties": [
         "/properties/Arn"
@@ -122,7 +155,10 @@
                 "ecr:CreateRepository",
                 "ecr:PutLifecyclePolicy",
                 "ecr:SetRepositoryPolicy",
-                "ecr:TagResource"
+                "ecr:TagResource",
+                "kms:DescribeKey",
+                "kms:CreateGrant",
+                "kms:RetireGrant"
             ]
         },
         "read": {
@@ -142,12 +178,16 @@
                 "ecr:DeleteLifecyclePolicy",
                 "ecr:DeleteRepositoryPolicy",
                 "ecr:PutImageScanningConfiguration",
-                "ecr:PutImageTagMutability"
+                "ecr:PutImageTagMutability",
+                "kms:DescribeKey",
+                "kms:CreateGrant",
+                "kms:RetireGrant"
             ]
         },
         "delete": {
             "permissions": [
-                "ecr:DeleteRepository"
+                "ecr:DeleteRepository",
+                "kms:RetireGrant"
             ]
         },
         "list": {

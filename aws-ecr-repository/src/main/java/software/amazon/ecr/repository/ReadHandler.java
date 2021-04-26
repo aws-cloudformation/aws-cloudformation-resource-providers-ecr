@@ -113,6 +113,16 @@ public class ReadHandler extends BaseHandlerStd {
             logger.log(String.format("AccessDenied error: %s for Repository: %s", e.getMessage(), repo.toString()));
         }
 
+        EncryptionConfiguration encryptionConfiguration = null;
+        if (repo.encryptionConfiguration() != null) {
+            encryptionConfiguration = EncryptionConfiguration.builder()
+                    .encryptionType(repo.encryptionConfiguration().encryptionTypeAsString())
+                    .build();
+            if (repo.encryptionConfiguration().kmsKey() != null) {
+                encryptionConfiguration.setKmsKey(repo.encryptionConfiguration().kmsKey());
+            }
+        }
+
         return ResourceModel.builder()
                 .repositoryName(repositoryName)
                 .lifecyclePolicy(lifecyclePolicy)
@@ -121,6 +131,7 @@ public class ReadHandler extends BaseHandlerStd {
                 .arn(arn)
                 .imageScanningConfiguration(ImageScanningConfiguration.builder().scanOnPush(repo.imageScanningConfiguration().scanOnPush()).build())
                 .imageTagMutability(repo.imageTagMutability().toString())
+                .encryptionConfiguration(encryptionConfiguration)
                 .build();
     }
 }

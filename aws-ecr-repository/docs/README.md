@@ -17,7 +17,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#repositorypolicytext" title="RepositoryPolicyText">RepositoryPolicyText</a>" : <i>Map, String</i>,
         "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
         "<a href="#imagetagmutability" title="ImageTagMutability">ImageTagMutability</a>" : <i>String</i>,
-        "<a href="#imagescanningconfiguration" title="ImageScanningConfiguration">ImageScanningConfiguration</a>" : <i><a href="imagescanningconfiguration.md">ImageScanningConfiguration</a></i>
+        "<a href="#imagescanningconfiguration" title="ImageScanningConfiguration">ImageScanningConfiguration</a>" : <i><a href="imagescanningconfiguration.md">ImageScanningConfiguration</a></i>,
+        "<a href="#encryptionconfiguration" title="EncryptionConfiguration">EncryptionConfiguration</a>" : <i><a href="encryptionconfiguration.md">EncryptionConfiguration</a></i>
     }
 }
 </pre>
@@ -34,6 +35,7 @@ Properties:
       - <a href="tag.md">Tag</a></i>
     <a href="#imagetagmutability" title="ImageTagMutability">ImageTagMutability</a>: <i>String</i>
     <a href="#imagescanningconfiguration" title="ImageScanningConfiguration">ImageScanningConfiguration</a>: <i><a href="imagescanningconfiguration.md">ImageScanningConfiguration</a></i>
+    <a href="#encryptionconfiguration" title="EncryptionConfiguration">EncryptionConfiguration</a>: <i><a href="encryptionconfiguration.md">EncryptionConfiguration</a></i>
 </pre>
 
 ## Properties
@@ -66,7 +68,7 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 #### RepositoryPolicyText
 
-The JSON repository policy text to apply to the repository. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/RepositoryPolicyExamples.html in the Amazon Elastic Container Registry User Guide.
+The JSON repository policy text to apply to the repository. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/RepositoryPolicyExamples.html in the Amazon Elastic Container Registry User Guide. 
 
 _Required_: No
 
@@ -106,6 +108,20 @@ _Type_: <a href="imagescanningconfiguration.md">ImageScanningConfiguration</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
+#### EncryptionConfiguration
+
+The encryption configuration for the repository. This determines how the contents of your repository are encrypted at rest.
+
+By default, when no encryption configuration is set or the AES256 encryption type is used, Amazon ECR uses server-side encryption with Amazon S3-managed encryption keys which encrypts your data at rest using an AES-256 encryption algorithm. This does not require any action on your part.
+
+For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/encryption-at-rest.html
+
+_Required_: No
+
+_Type_: <a href="encryptionconfiguration.md">EncryptionConfiguration</a>
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
 ## Return Values
 
 ### Ref
@@ -121,3 +137,4 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### Arn
 
 Returns the <code>Arn</code> value.
+
