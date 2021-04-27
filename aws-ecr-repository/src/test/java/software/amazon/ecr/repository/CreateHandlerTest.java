@@ -3,6 +3,7 @@ package software.amazon.ecr.repository;
 import software.amazon.awssdk.services.ecr.EcrClient;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
 import software.amazon.awssdk.services.ecr.model.InvalidParameterException;
+import software.amazon.awssdk.services.ecr.model.KmsException;
 import software.amazon.awssdk.services.ecr.model.PutLifecyclePolicyRequest;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
@@ -93,6 +94,10 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .imageScanningConfiguration(
                         software.amazon.ecr.repository.ImageScanningConfiguration.builder()
                                 .scanOnPush(true)
+                                .build())
+                .encryptionConfiguration(
+                        software.amazon.ecr.repository.EncryptionConfiguration.builder()
+                                .encryptionType("KMS")
                                 .build())
                 .build();
 
@@ -202,6 +207,39 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
         assertThat(response.getResourceModel().getArn()).isEqualTo("arn");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getResourceModel().getRepositoryName()).isNotNull();
+    }
+
+    @Test
+    public void handleRequest_InvalidEncryptionConfiguration() {
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .encryptionConfiguration(EncryptionConfiguration.builder().encryptionType("AES256").build())
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .logicalResourceIdentifier("MyResource")
+                .clientRequestToken("token")
+                .desiredResourceState(model)
+                .build();
+
+        doThrow(KmsException.class)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(CreateRepositoryRequest.class), any());
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
+        assertThat(response.getResourceModel().getArn()).isNull();
 
         assertThat(response).isNotNull();
         assertThat(response.getCallbackContext()).isNull();

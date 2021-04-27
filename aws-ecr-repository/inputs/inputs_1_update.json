@@ -4,5 +4,8 @@
     "ImageTagMutability": "MUTABLE",
     "ImageScanningConfiguration": {
         "ScanOnPush": true
+    },
+    "EncryptionConfiguration": {
+        "EncryptionType": "AES256"
     }
 }

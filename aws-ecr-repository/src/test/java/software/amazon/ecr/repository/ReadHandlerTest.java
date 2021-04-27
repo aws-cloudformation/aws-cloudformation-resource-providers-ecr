@@ -3,6 +3,8 @@ package software.amazon.ecr.repository;
 import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.services.ecr.EcrClient;
 import software.amazon.awssdk.services.ecr.model.EcrException;
+import software.amazon.awssdk.services.ecr.model.EncryptionConfiguration;
+import software.amazon.awssdk.services.ecr.model.EncryptionType;
 import software.amazon.awssdk.services.ecr.model.ImageScanningConfiguration;
 import software.amazon.awssdk.services.ecr.model.ImageTagMutability;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -60,6 +62,7 @@ class ReadHandlerTest extends AbstractTestBase {
             .repositoryArn("arn")
             .imageScanningConfiguration(ImageScanningConfiguration.builder().scanOnPush(true).build())
             .imageTagMutability(ImageTagMutability.MUTABLE)
+            .encryptionConfiguration(EncryptionConfiguration.builder().encryptionType(EncryptionType.AES256).build())
             .build();
 
     private final DescribeRepositoriesResponse describeRepositoriesResponse = DescribeRepositoriesResponse.builder()
@@ -121,6 +124,7 @@ class ReadHandlerTest extends AbstractTestBase {
                 .arn("arn")
                 .imageTagMutability("MUTABLE")
                 .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(true).build())
+                .encryptionConfiguration(software.amazon.ecr.repository.EncryptionConfiguration.builder().encryptionType("AES256").build())
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
@@ -171,6 +175,7 @@ class ReadHandlerTest extends AbstractTestBase {
                 .arn("arn")
                 .imageTagMutability("MUTABLE")
                 .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(true).build())
+                .encryptionConfiguration(software.amazon.ecr.repository.EncryptionConfiguration.builder().encryptionType("AES256").build())
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
@@ -239,6 +244,7 @@ class ReadHandlerTest extends AbstractTestBase {
                 .arn("arn")
                 .imageTagMutability("MUTABLE")
                 .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(true).build())
+                .encryptionConfiguration(software.amazon.ecr.repository.EncryptionConfiguration.builder().encryptionType("AES256").build())
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
@@ -291,6 +297,7 @@ class ReadHandlerTest extends AbstractTestBase {
             .arn("arn")
             .imageTagMutability("MUTABLE")
             .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder().scanOnPush(true).build())
+            .encryptionConfiguration(software.amazon.ecr.repository.EncryptionConfiguration.builder().encryptionType("AES256").build())
             .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =

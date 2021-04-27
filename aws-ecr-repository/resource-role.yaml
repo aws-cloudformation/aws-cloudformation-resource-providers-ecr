@@ -37,6 +37,9 @@ Resources:
                 - "ecr:SetRepositoryPolicy"
                 - "ecr:TagResource"
                 - "ecr:UntagResource"
+                - "kms:CreateGrant"
+                - "kms:DescribeKey"
+                - "kms:RetireGrant"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

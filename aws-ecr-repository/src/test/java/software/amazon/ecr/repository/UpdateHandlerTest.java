@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.ecr.model.DeleteRepositoryPolicyRequest;
 import software.amazon.awssdk.services.ecr.model.DeleteRepositoryPolicyResponse;
 import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesRequest;
 import software.amazon.awssdk.services.ecr.model.DescribeRepositoriesResponse;
+import software.amazon.awssdk.services.ecr.model.EncryptionConfiguration;
 import software.amazon.awssdk.services.ecr.model.GetLifecyclePolicyRequest;
 import software.amazon.awssdk.services.ecr.model.GetLifecyclePolicyResponse;
 import software.amazon.awssdk.services.ecr.model.GetRepositoryPolicyRequest;
@@ -79,6 +80,9 @@ class UpdateHandlerTest extends AbstractTestBase {
             .imageScanningConfiguration(ImageScanningConfiguration.builder()
                     .scanOnPush(true)
                     .build())
+            .encryptionConfiguration(EncryptionConfiguration.builder()
+                    .encryptionType("AES256")
+                    .build())
             .build();
 
     private final DescribeRepositoriesResponse describeRepositoriesResponse = DescribeRepositoriesResponse.builder()
@@ -104,6 +108,9 @@ class UpdateHandlerTest extends AbstractTestBase {
     private final PutImageTagMutabilityResponse putImageTagMutabilityResponse = PutImageTagMutabilityResponse.builder().build();
     private final PutImageScanningConfigurationResponse putImageScanningConfigurationResponse = PutImageScanningConfigurationResponse.builder().build();
 
+    private final ResourceModel previousModel = ResourceModel.builder()
+            .repositoryName("repo")
+            .build();
 
     @BeforeEach
     public void setup() {
@@ -152,10 +159,21 @@ class UpdateHandlerTest extends AbstractTestBase {
                 .imageScanningConfiguration(software.amazon.ecr.repository.ImageScanningConfiguration.builder()
                         .scanOnPush(true)
                         .build())
+                .encryptionConfiguration(software.amazon.ecr.repository.EncryptionConfiguration.builder()
+                        .encryptionType("AES256")
+                        .build())
+                .build();
+
+        final ResourceModel previousModel = ResourceModel.builder()
+                .repositoryName("repo")
+                .encryptionConfiguration(software.amazon.ecr.repository.EncryptionConfiguration.builder()
+                        .encryptionType("AES256")
+                        .build())
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
+                .previousResourceState(previousModel)
                 .desiredResourceTags(newTagsMap)
                 .build();
 
@@ -186,6 +204,7 @@ class UpdateHandlerTest extends AbstractTestBase {
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .previousResourceState(previousModel)
                 .desiredResourceState(model)
                 .build();
 
@@ -223,6 +242,7 @@ class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
+                .previousResourceState(previousModel)
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response
@@ -250,6 +270,7 @@ class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
+                .previousResourceState(previousModel)
                 .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
@@ -258,5 +279,49 @@ class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
+    }
+
+    @Test
+    void handleRequest_ChangeEncryptionConfigurations() {
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .encryptionConfiguration(software.amazon.ecr.repository.EncryptionConfiguration.builder()
+                        .encryptionType("KMS")
+                        .build())
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .previousResourceState(previousModel)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler
+                .handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotUpdatable);
+    }
+
+    @Test
+    void handleRequest_DeleteEncryptionConfiguration() {
+        final ResourceModel model = ResourceModel.builder()
+                .repositoryName("repo")
+                .encryptionConfiguration(software.amazon.ecr.repository.EncryptionConfiguration.builder()
+                        .encryptionType("KMS")
+                        .build())
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(previousModel)
+                .previousResourceState(model)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler
+                .handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotUpdatable);
     }
 }

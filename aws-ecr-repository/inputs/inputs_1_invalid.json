@@ -13,5 +13,8 @@
             }
         ]
     },
+    "EncryptionConfiguration": {
+        "EncryptionType": "INVALID"
+    },
     "ImageTagMutability": "INVALID"
 }

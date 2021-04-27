@@ -1,5 +1,6 @@
 package software.amazon.ecr.repository;
 
+import software.amazon.awssdk.services.ecr.model.Repository;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -40,6 +41,23 @@ public class UpdateHandler extends BaseHandlerStd {
         this.proxy = proxy;
 
         try {
+            final ResourceModel previousModel = request.getPreviousResourceState();
+            if (model.getEncryptionConfiguration() != null) {
+                if (!model.getEncryptionConfiguration().equals(previousModel.getEncryptionConfiguration())) {
+                    return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                            .errorCode(HandlerErrorCode.NotUpdatable)
+                            .status(OperationStatus.FAILED)
+                            .message("The encryption settings cannot be changed after the repository is created.")
+                            .build();
+                }
+            } else if (previousModel.getEncryptionConfiguration() != null) {
+                return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                        .errorCode(HandlerErrorCode.NotUpdatable)
+                        .status(OperationStatus.FAILED)
+                        .message("The encryption settings cannot be changed after the repository is created.")
+                        .build();
+            }
+
             if (model.getRepositoryPolicyText() != null) {
                 proxy.injectCredentialsAndInvokeV2(Translator.setRepositoryPolicyRequest(model), client::setRepositoryPolicy);
             } else {
