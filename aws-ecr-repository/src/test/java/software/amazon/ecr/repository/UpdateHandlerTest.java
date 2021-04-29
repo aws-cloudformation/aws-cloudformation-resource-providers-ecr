@@ -76,6 +76,7 @@ class UpdateHandlerTest extends AbstractTestBase {
             .repositoryName("repo")
             .registryId("id")
             .repositoryArn("arn")
+            .repositoryUri("uri")
             .imageTagMutability("IMMUTABLE")
             .imageScanningConfiguration(ImageScanningConfiguration.builder()
                     .scanOnPush(true)
