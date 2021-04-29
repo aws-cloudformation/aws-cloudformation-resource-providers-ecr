@@ -92,7 +92,9 @@ public class UpdateHandler extends BaseHandlerStd {
 
             final DescribeRepositoriesResponse describeResponse = proxy.injectCredentialsAndInvokeV2(Translator.describeRepositoriesRequest(model), client::describeRepositories);
             final String arn = describeResponse.repositories().get(0).repositoryArn();
+            final String uri = describeResponse.repositories().get(0).repositoryUri();
             model.setArn(arn);
+            model.setRepositoryUri(uri);
             handleTagging(request.getDesiredResourceTags(), arn);
             logger.log(String.format("%s [%s] Update Successful", ResourceModel.TYPE_NAME, model.getRepositoryName()));
         } catch (RepositoryNotFoundException e) {

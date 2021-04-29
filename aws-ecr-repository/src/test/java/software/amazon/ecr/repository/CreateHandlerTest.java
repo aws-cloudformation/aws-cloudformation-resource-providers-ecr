@@ -53,6 +53,7 @@ public class CreateHandlerTest extends AbstractTestBase {
             .repositoryName("repo")
             .registryId("id")
             .repositoryArn("arn")
+            .repositoryUri("uri")
             .imageTagMutability("IMMUTABLE")
             .imageScanningConfiguration(
                     ImageScanningConfiguration.builder()
@@ -207,6 +208,7 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
         assertThat(response.getResourceModel().getArn()).isEqualTo("arn");
+        assertThat(response.getResourceModel().getRepositoryUri()).isEqualTo("uri");
 
         assertThat(response).isNotNull();
         assertThat(response.getCallbackContext()).isNull();

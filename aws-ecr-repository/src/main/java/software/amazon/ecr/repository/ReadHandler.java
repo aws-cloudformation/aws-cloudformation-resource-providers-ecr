@@ -67,6 +67,7 @@ public class ReadHandler extends BaseHandlerStd {
 
     public static ResourceModel buildModel(final AmazonWebServicesClientProxy proxy, final ProxyClient<EcrClient> proxyClient, final Repository repo, final Logger logger) {
         final String arn = repo.repositoryArn();
+        final String repositoryUri = repo.repositoryUri();
         final String repositoryName = repo.repositoryName();
         final String registryId = repo.registryId();
         final EcrClient client = proxyClient.client();
@@ -129,6 +130,7 @@ public class ReadHandler extends BaseHandlerStd {
                 .repositoryPolicyText(repositoryPolicyText)
                 .tags(tags)
                 .arn(arn)
+                .repositoryUri(repositoryUri)
                 .imageScanningConfiguration(ImageScanningConfiguration.builder().scanOnPush(repo.imageScanningConfiguration().scanOnPush()).build())
                 .imageTagMutability(repo.imageTagMutability().toString())
                 .encryptionConfiguration(encryptionConfiguration)
