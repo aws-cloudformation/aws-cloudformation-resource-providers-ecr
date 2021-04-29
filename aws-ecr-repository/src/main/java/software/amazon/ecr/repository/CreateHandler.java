@@ -48,6 +48,8 @@ public class CreateHandler extends BaseHandlerStd {
                             request.getDesiredResourceTags()),
                     client::createRepository);
             model.setArn(response.repository().repositoryArn());
+            model.setRepositoryUri(response.repository().repositoryUri());
+
             logger.log(String.format("%s [%s] Created Successfully", ResourceModel.TYPE_NAME, model.getRepositoryName()));
         } catch (RepositoryAlreadyExistsException e) {
             throw new ResourceAlreadyExistsException(ResourceModel.TYPE_NAME, model.getRepositoryName());

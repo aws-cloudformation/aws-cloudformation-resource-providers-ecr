@@ -102,6 +102,9 @@
         "Arn": {
             "type": "string"
         },
+        "RepositoryUri": {
+            "type": "string"
+        },
         "ImageTagMutability": {
             "type": "string",
             "description": "The image tag mutability setting for the repository.",
@@ -144,7 +147,8 @@
         "/properties/EncryptionConfiguration/KmsKey"
     ],
     "readOnlyProperties": [
-        "/properties/Arn"
+        "/properties/Arn",
+        "/properties/RepositoryUri"
     ],
     "primaryIdentifier": [
         "/properties/RepositoryName"
