@@ -52,9 +52,35 @@
             ],
             "additionalProperties": false
         },
+        "ImageScanningConfiguration": {
+            "type": "object",
+            "description": "The image scanning configuration for the repository. This setting determines whether images are scanned for known vulnerabilities after being pushed to the repository.",
+            "properties": {
+                "ScanOnPush": {
+                    "$ref": "#/definitions/ScanOnPush"
+                }
+            },
+            "additionalProperties": false
+        },
         "ScanOnPush": {
             "type": "boolean",
             "description": "The setting that determines whether images are scanned after being pushed to a repository."
+        },
+        "EncryptionConfiguration": {
+            "type": "object",
+            "description": "The encryption configuration for the repository. This determines how the contents of your repository are encrypted at rest.\n\nBy default, when no encryption configuration is set or the AES256 encryption type is used, Amazon ECR uses server-side encryption with Amazon S3-managed encryption keys which encrypts your data at rest using an AES-256 encryption algorithm. This does not require any action on your part.\n\nFor more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/encryption-at-rest.html",
+            "properties": {
+                "EncryptionType": {
+                    "$ref": "#/definitions/EncryptionType"
+                },
+                "KmsKey": {
+                    "$ref": "#/definitions/KmsKey"
+                }
+            },
+            "required": [
+                "EncryptionType"
+            ],
+            "additionalProperties": false
         },
         "EncryptionType": {
             "type": "string",
@@ -114,30 +140,10 @@
             ]
         },
         "ImageScanningConfiguration": {
-            "type": "object",
-            "description": "The image scanning configuration for the repository. This setting determines whether images are scanned for known vulnerabilities after being pushed to the repository.",
-            "properties": {
-                "ScanOnPush": {
-                    "$ref": "#/definitions/ScanOnPush"
-                }
-            },
-            "additionalProperties": false
+            "$ref": "#/definitions/ImageScanningConfiguration"
         },
         "EncryptionConfiguration": {
-            "type": "object",
-            "description": "The encryption configuration for the repository. This determines how the contents of your repository are encrypted at rest.\n\nBy default, when no encryption configuration is set or the AES256 encryption type is used, Amazon ECR uses server-side encryption with Amazon S3-managed encryption keys which encrypts your data at rest using an AES-256 encryption algorithm. This does not require any action on your part.\n\nFor more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/encryption-at-rest.html",
-            "properties": {
-                "EncryptionType": {
-                    "$ref": "#/definitions/EncryptionType"
-                },
-                "KmsKey": {
-                    "$ref": "#/definitions/KmsKey"
-                }
-            },
-            "required": [
-                "EncryptionType"
-            ],
-            "additionalProperties": false
+            "$ref": "#/definitions/EncryptionConfiguration"
         }
     },
     "createOnlyProperties": [
