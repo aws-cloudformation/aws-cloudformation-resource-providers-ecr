@@ -1,7 +1,6 @@
 package software.amazon.ecr.registrypolicy;
 
 import software.amazon.awssdk.services.ecr.EcrClient;
-import software.amazon.awssdk.services.ecr.model.GetRegistryPolicyResponse;
 import software.amazon.awssdk.services.ecr.model.PutRegistryPolicyResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
