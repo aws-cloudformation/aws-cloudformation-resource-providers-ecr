@@ -9,10 +9,16 @@ import software.amazon.awssdk.services.ecr.model.GetRegistryPolicyResponse;
 import software.amazon.awssdk.services.ecr.model.PutRegistryPolicyRequest;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
+import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.Collections.emptyList;
 
 /**
  * This class is a centralized placeholder for
@@ -67,6 +73,26 @@ public class Translator {
     return ResourceModel.builder()
             .registryId(response.registryId())
             .policyText(deserializePolicyText(response.policyText()))
+            .build();
+  }
+
+  /**
+   * Translates resource response from sdk into a resource model list
+   * @param response the GetRegistryPolicyResponse
+   * @return ProgressEvent resource model and context
+   */
+  static ProgressEvent<ResourceModel, CallbackContext> translateToListResponseEvent(final GetRegistryPolicyResponse response) {
+    List<ResourceModel> models;
+    if (response == null) {
+      models = emptyList();
+    } else {
+      models = Collections.singletonList(translateFromReadResponse(response));
+    }
+
+    return ProgressEvent.<ResourceModel, CallbackContext>builder()
+            .resourceModels(models)
+            .nextToken(null)
+            .status(OperationStatus.SUCCESS)
             .build();
   }
 

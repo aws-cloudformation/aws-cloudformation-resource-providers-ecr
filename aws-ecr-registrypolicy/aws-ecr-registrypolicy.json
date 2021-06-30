@@ -40,6 +40,11 @@
                 "ecr:GetRegistryPolicy"
             ]
         },
+        "list": {
+            "permissions": [
+                "ecr:GetRegistryPolicy"
+            ]
+        },
         "update": {
             "permissions": [
                 "ecr:PutRegistryPolicy"

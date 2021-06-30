@@ -3,13 +3,10 @@ package software.amazon.ecr.registrypolicy;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
-import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import org.json.JSONObject;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.core.ResponseBytes;

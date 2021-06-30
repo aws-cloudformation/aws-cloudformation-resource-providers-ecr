@@ -15,10 +15,12 @@ import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+import java.util.List;
 
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
   @Override
@@ -51,6 +53,30 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
           final ResourceModel resourceModel,
           final CallbackContext callbackContext) {
 
+    BaseHandlerException ex = convertException(e);
+    return ProgressEvent.failed(resourceModel, callbackContext, ex.getErrorCode(), ex.getMessage());
+  }
+
+  protected ProgressEvent<ResourceModel, CallbackContext> handleError(
+          final Exception e,
+          final List<ResourceModel> models,
+          final CallbackContext callbackContext) {
+
+    BaseHandlerException ex = convertException(e);
+    ProgressEvent <ResourceModel, CallbackContext> event = ProgressEvent.<ResourceModel, CallbackContext>builder()
+            .resourceModels(models)
+            .callbackContext(callbackContext)
+            .nextToken(null)
+            .status(OperationStatus.SUCCESS)
+            .build();
+    event.setStatus(OperationStatus.FAILED);
+    event.setErrorCode(ex.getErrorCode());
+    event.setMessage(ex.getMessage());
+
+    return event;
+  }
+
+  private BaseHandlerException convertException(final Exception e) {
     BaseHandlerException ex;
 
     if (e instanceof RegistryPolicyNotFoundException) {
@@ -65,7 +91,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
       ex = new CfnGeneralServiceException(e);
     }
 
-    return ProgressEvent.failed(resourceModel, callbackContext, ex.getErrorCode(), ex.getMessage());
+    return ex;
   }
 
   protected abstract ProgressEvent<ResourceModel, CallbackContext> handleRequest(
