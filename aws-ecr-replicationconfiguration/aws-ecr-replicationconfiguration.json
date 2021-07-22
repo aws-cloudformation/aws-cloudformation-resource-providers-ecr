@@ -114,6 +114,11 @@
                 "ecr:PutReplicationConfiguration",
                 "iam:CreateServiceLinkedRole"
             ]
+        },
+        "list": {
+            "permissions": [
+                "ecr:DescribeRegistry"
+            ]
         }
     }
 }

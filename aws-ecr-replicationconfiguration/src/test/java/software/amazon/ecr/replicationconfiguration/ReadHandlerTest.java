@@ -44,7 +44,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_SimpleSuccess() {
+    void handleRequest_SimpleSuccess() {
         // Setup
         // Mock DescribeRegistryRequest call
         doReturn(TestSdkResponseHelper.oneDestinationDescribeRegistryResponse())
@@ -71,7 +71,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_NoExistingResourceResponse() {
+    void handleRequest_NoExistingResourceResponse() {
         // Setup
         // Mock DescribeRegistryRequest call
         doReturn(TestSdkResponseHelper.emptyDescribeRegistryResponse())
@@ -98,7 +98,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_GeneralException() {
+    void handleRequest_GeneralException() {
         // Setup
         // Mock DescribeRegistryRequest call
         doThrow(AwsServiceException.class)
