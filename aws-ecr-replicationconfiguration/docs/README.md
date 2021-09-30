@@ -52,3 +52,4 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### RegistryId
 
 The RegistryId associated with the aws account.
+
