@@ -79,6 +79,38 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
+    public void handleRequestWithRepoFilter_SimpleSuccess() {
+        // Setup
+        // Mock DescribeRegistryRequest call
+        doReturn(TestSdkResponseHelper.oneDestinationOneFilterDescribeRegistryResponse())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeRegistryRequest.class), any());
+
+        // Mock PutReplicationConfigurationRequest call
+        doReturn(TestSdkResponseHelper.oneDestinationOneFilterPutReplicationConfigurationResponse())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(PutReplicationConfigurationRequest.class), any());
+
+        // Generate test request with repo filter
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter =
+                TestHelper.generateRequestWithFilter(TestHelper.multipleDestinations(), TestHelper.multipleFilters());
+
+        // Request with repo filter
+        final ProgressEvent<ResourceModel, CallbackContext> responseWithRepoFilter =
+                handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger);
+
+        // Validation with Repo Filter
+        assertThat(responseWithRepoFilter).isNotNull();
+        assertThat(responseWithRepoFilter.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(responseWithRepoFilter.getCallbackContext()).isNull();
+        assertThat(responseWithRepoFilter.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(responseWithRepoFilter.getResourceModel()).isEqualTo(requestWithRepoFilter.getDesiredResourceState());
+        assertThat(responseWithRepoFilter.getResourceModels()).isNull();
+        assertThat(responseWithRepoFilter.getMessage()).isNull();
+        assertThat(responseWithRepoFilter.getErrorCode()).isNull();
+    }
+
+    @Test
     public void handleRequest_NoExistingResourceException() {
         // Setup
         // Mock DescribeRegistryRequest call
@@ -90,8 +122,16 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceHandlerRequest<ResourceModel> request =
                 TestHelper.generateRequest(TestHelper.multipleDestinations());
 
+        // Generate test request with Repo Filter
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter =
+                TestHelper.generateRequestWithFilter(TestHelper.multipleDestinations(), TestHelper.multipleFilters());
+
         // Request & Validation
         assertThatThrownBy(() -> handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        // Request & Validation with Repo Filter
+        assertThatThrownBy(() -> handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -126,4 +166,55 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
     }
+
+    @Test
+    public void handleRequestWithRepoFilter_GeneralException() {
+        // Setup
+        // Mock DescribeRegistryRequest call
+        doReturn(TestSdkResponseHelper.oneDestinationOneFilterDescribeRegistryResponse())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeRegistryRequest.class), any());
+
+        // Mock PutReplicationConfigurationRequest call
+        doThrow(AwsServiceException.class)
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(PutReplicationConfigurationRequest.class), any());
+        // Generate test request
+        final ResourceHandlerRequest<ResourceModel> request =
+                TestHelper.generateRequest(TestHelper.multipleDestinations());
+
+        // Request
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        // Generate test request with repo filter
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter =
+                TestHelper.generateRequestWithFilter(TestHelper.multipleDestinations(), TestHelper.multipleFilters());
+
+        // Request for repo filter
+        final ProgressEvent<ResourceModel, CallbackContext> responseWithRepoFilter =
+                handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger);
+
+        // Validation
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
+
+
+        // Validation for repo filter
+        assertThat(responseWithRepoFilter).isNotNull();
+        assertThat(responseWithRepoFilter.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(responseWithRepoFilter.getCallbackContext()).isNull();
+        assertThat(responseWithRepoFilter.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(responseWithRepoFilter.getResourceModel()).isEqualTo(requestWithRepoFilter.getDesiredResourceState());
+        assertThat(responseWithRepoFilter.getResourceModels()).isNull();
+        assertThat(responseWithRepoFilter.getMessage()).isNull();
+        assertThat(responseWithRepoFilter.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
+    }
 }
+

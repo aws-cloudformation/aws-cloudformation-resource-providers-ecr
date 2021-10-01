@@ -64,6 +64,30 @@ class ListHandlerTest extends AbstractTestBase {
     }
 
     @Test
+    void handleRequestWithRepoFilter_SimpleSuccess() {
+        doReturn(TestSdkResponseHelper.oneDestinationOneFilterDescribeRegistryResponse())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeRegistryRequest.class), any());
+
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter =
+                TestHelper.generateRequestWithPrimaryIdForRepoFilter(TestHelper.singleDestination(), TestHelper.singleFilter());
+
+        // Request for Repo Filter
+        final ProgressEvent<ResourceModel, CallbackContext> responseWithRepoFilter
+                = handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger);
+
+        //With Repo Filter
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(responseWithRepoFilter).isNotNull();
+        softly.assertThat(responseWithRepoFilter.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        softly.assertThat(responseWithRepoFilter.getCallbackDelaySeconds()).isZero();
+        softly.assertThat(responseWithRepoFilter.getResourceModel()).isNull();
+        softly.assertThat(responseWithRepoFilter.getResourceModels()).isNotNull();
+        softly.assertThat(responseWithRepoFilter.getResourceModels().get(0)).isEqualTo(requestWithRepoFilter.getDesiredResourceState());
+        softly.assertAll();
+    }
+
+    @Test
     void handleRequest_NoExistingResourceReturnsSuccessWithEmptyList() {
         doReturn(TestSdkResponseHelper.emptyDescribeRegistryResponse())
                 .when(proxy)
@@ -76,6 +100,14 @@ class ListHandlerTest extends AbstractTestBase {
         final ProgressEvent<ResourceModel, CallbackContext> response
                 = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
+        //with repo filter
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter =
+                TestHelper.generateRequestWithFilter(TestHelper.multipleDestinations(), TestHelper.multipleFilters());
+
+        // Request with repoFilter
+        final ProgressEvent<ResourceModel, CallbackContext> responseWithRepoFilter
+                = handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger);
+
         // Validation
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(response).isNotNull();
@@ -84,6 +116,13 @@ class ListHandlerTest extends AbstractTestBase {
         softly.assertThat(response.getResourceModel()).isNull();
         softly.assertThat(response.getResourceModels()).isEmpty();
         softly.assertAll();
+
+        // Validation with repo filter
+        softly.assertThat(responseWithRepoFilter).isNotNull();
+        softly.assertThat(responseWithRepoFilter.getStatus()).isEqualTo(OperationStatus.FAILED);
+        softly.assertThat(responseWithRepoFilter.getResourceModel()).isNull();
+        softly.assertThat(responseWithRepoFilter.getResourceModels()).isEmpty();
+        softly.assertThat(responseWithRepoFilter.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
     }
 
     @Test

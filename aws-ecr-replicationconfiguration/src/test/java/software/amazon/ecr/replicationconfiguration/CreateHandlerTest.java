@@ -65,7 +65,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         // Request
         final ProgressEvent<ResourceModel, CallbackContext> response
-            = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
         // Validation
         assertThat(response).isNotNull();
@@ -76,6 +76,37 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handleRequestWithRepoFilter_SimpleSuccess() {
+        // Setup
+        // Mock DescribeRegistryRequest call
+        doReturn(TestSdkResponseHelper.emptyDescribeRegistryResponse())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeRegistryRequest.class), any());
+
+        // Mock PutReplicationConfigurationRequest call
+        doReturn(TestSdkResponseHelper.oneDestinationOneFilterPutReplicationConfigurationResponse())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(PutReplicationConfigurationRequest.class), any());
+
+        // Generate test request
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter = TestHelper.generateRequestWithFilter(TestHelper.singleDestination(), TestHelper.singleFilter());
+
+        // Request with repo filter
+        final ProgressEvent<ResourceModel, CallbackContext> responseWithRepoFilter
+                = handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger);
+
+        // Validation for repo filter
+        assertThat(responseWithRepoFilter).isNotNull();
+        assertThat(responseWithRepoFilter.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(responseWithRepoFilter.getCallbackContext()).isNull();
+        assertThat(responseWithRepoFilter.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(responseWithRepoFilter.getResourceModel()).isEqualTo(requestWithRepoFilter.getDesiredResourceState());
+        assertThat(responseWithRepoFilter.getResourceModels()).isNull();
+        assertThat(responseWithRepoFilter.getMessage()).isNull();
+        assertThat(responseWithRepoFilter.getErrorCode()).isNull();
     }
 
     @Test
@@ -91,6 +122,22 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         // Request and Validation
         assertThatThrownBy(() -> handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger))
+                .isInstanceOf(ResourceAlreadyExistsException.class);
+    }
+
+    @Test
+    public void handleRequestWithRepoFilter_AlreadyExistsException() {
+        // Setup
+        // Mock DescribeRegistryRequest call
+        doReturn(TestSdkResponseHelper.oneDestinationOneFilterDescribeRegistryResponse())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeRegistryRequest.class), any());
+
+        // Generate test request with repo filter
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter = TestHelper.generateRequestWithFilter(TestHelper.singleDestination(), TestHelper.singleFilter());
+
+        // Request and Validation for repo filter
+        assertThatThrownBy(() -> handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger))
                 .isInstanceOf(ResourceAlreadyExistsException.class);
     }
 
@@ -114,6 +161,13 @@ public class CreateHandlerTest extends AbstractTestBase {
         final ProgressEvent<ResourceModel, CallbackContext> response
                 = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
+        // Generate test request with repo filter
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter = TestHelper.generateRequestWithFilter(TestHelper.singleDestination(), TestHelper.singleFilter());
+
+        // Request for repo filter
+        final ProgressEvent<ResourceModel, CallbackContext> responseWithRepoFilter
+                = handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger);
+
         // Validation
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
@@ -123,6 +177,16 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
+
+        // Validation for repo filter
+        assertThat(responseWithRepoFilter).isNotNull();
+        assertThat(responseWithRepoFilter.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(responseWithRepoFilter.getCallbackContext()).isNull();
+        assertThat(responseWithRepoFilter.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(responseWithRepoFilter.getResourceModel()).isEqualTo(requestWithRepoFilter.getDesiredResourceState());
+        assertThat(responseWithRepoFilter.getResourceModels()).isNull();
+        assertThat(responseWithRepoFilter.getMessage()).isNull();
+        assertThat(responseWithRepoFilter.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
     }
 
     @Test
@@ -141,9 +205,16 @@ public class CreateHandlerTest extends AbstractTestBase {
         // Generate test request
         final ResourceHandlerRequest<ResourceModel> request = TestHelper.generateRequest(TestHelper.singleDestination());
 
+        // Generate test request for repo filter
+        final ResourceHandlerRequest<ResourceModel> requestWithRepoFilter = TestHelper.generateRequestWithFilter(TestHelper.singleDestination(), TestHelper.singleFilter());
+
         // Request
         final ProgressEvent<ResourceModel, CallbackContext> response
                 = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        // Request for repo filter
+        final ProgressEvent<ResourceModel, CallbackContext> responseWithRepoFilter
+                = handler.handleRequest(proxy, requestWithRepoFilter, new CallbackContext(), proxyEcrClient, logger);
 
         // Validation
         assertThat(response).isNotNull();
@@ -154,5 +225,15 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
+
+        // Validation for repo filter
+        assertThat(responseWithRepoFilter).isNotNull();
+        assertThat(responseWithRepoFilter.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(responseWithRepoFilter.getCallbackContext()).isNull();
+        assertThat(responseWithRepoFilter.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(responseWithRepoFilter.getResourceModel()).isEqualTo(requestWithRepoFilter.getDesiredResourceState());
+        assertThat(responseWithRepoFilter.getResourceModels()).isNull();
+        assertThat(responseWithRepoFilter.getMessage()).isNull();
+        assertThat(responseWithRepoFilter.getErrorCode()).isEqualTo(HandlerErrorCode.GeneralServiceException);
     }
 }
