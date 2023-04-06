@@ -1,0 +1,24 @@
+{
+  "CreateInputs": {
+    "ReplicationConfiguration": {
+      "Rules": [
+        {
+          "Destinations": [
+            {
+              "Region": "us-east-2",
+              "RegistryId": "999999999999"
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "/ReplicationConfiguration/Rules/0/Destinations/0/RegistryId",
+      "value": "888888888888"
+    }
+  ]
+}
