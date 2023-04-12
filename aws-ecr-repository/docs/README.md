@@ -58,9 +58,9 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>2</code>
+_Minimum Length_: <code>2</code>
 
-_Maximum_: <code>256</code>
+_Maximum Length_: <code>256</code>
 
 _Pattern_: <code>^(?=.{2,256}$)((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)$</code>
 
@@ -68,7 +68,7 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 #### RepositoryPolicyText
 
-The JSON repository policy text to apply to the repository. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/RepositoryPolicyExamples.html in the Amazon Elastic Container Registry User Guide.
+The JSON repository policy text to apply to the repository. For more information, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/RepositoryPolicyExamples.html in the Amazon Elastic Container Registry User Guide. 
 
 _Required_: No
 
@@ -141,3 +141,4 @@ Returns the <code>Arn</code> value.
 #### RepositoryUri
 
 Returns the <code>RepositoryUri</code> value.
+
