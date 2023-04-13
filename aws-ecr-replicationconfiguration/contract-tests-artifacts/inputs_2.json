@@ -1,0 +1,27 @@
+{
+  "CreateInputs": {
+    "ReplicationConfiguration": {
+      "Rules": [
+        {
+          "RepositoryFilters": [
+            {"Filter": "prod", "FilterType": "PREFIX_MATCH"}
+          ],
+          "Destinations": [
+            {
+              "Region": "us-east-2",
+              "RegistryId": "777777777777"
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "/ReplicationConfiguration/Rules/0/RepositoryFilters/0/Filter",
+      "value": "test-"
+    }
+  ]
+}

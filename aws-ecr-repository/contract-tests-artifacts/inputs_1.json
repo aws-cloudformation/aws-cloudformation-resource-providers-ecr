@@ -1,0 +1,43 @@
+{
+    "CreateInputs": {
+        "RepositoryName": "my-testing-inputs-repository-test",
+        "Tags": [
+            {
+                "Key": "Env",
+                "Value": "Dev"
+            }
+        ],
+        "ImageTagMutability": "MUTABLE",
+        "ImageScanningConfiguration": {
+            "ScanOnPush": false
+        },
+        "EncryptionConfiguration": {
+            "EncryptionType": "KMS"
+        },
+        "RepositoryPolicyText": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "AllowPushPull",
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": [
+                        "ecr:GetDownloadUrlForLayer",
+                        "ecr:BatchGetImage"
+                    ]
+                }
+            ]
+        },
+        "LifecyclePolicy": {
+            "LifecyclePolicyText": "{\"rules\":[{\"rulePriority\":1,\"description\":\"Keep only one untagged image, expire all others\",\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"imageCountMoreThan\",\"countNumber\":1},\"action\":{\"type\":\"expire\"}}]}"
+        }
+    },
+
+    "PatchInputs": [
+        {
+            "op": "replace",
+            "path": "/ImageScanningConfiguration/ScanOnPush",
+            "value": true
+        }
+    ]
+}
