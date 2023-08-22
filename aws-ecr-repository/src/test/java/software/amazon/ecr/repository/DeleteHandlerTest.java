@@ -49,7 +49,7 @@ class DeleteHandlerTest extends AbstractTestBase {
     @Test
     void handleRequest_SimpleSuccess() {
         final ProgressEvent<ResourceModel, CallbackContext> response
-            = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -69,5 +69,28 @@ class DeleteHandlerTest extends AbstractTestBase {
 
         assertThatThrownBy(() -> handler.handleRequest(proxy, request, context, proxyEcrClient, logger))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void handleRequest_SuccessWithForceDelete() {
+        model = ResourceModel.builder()
+                .repositoryName("repo")
+                .emptyOnDelete(true)
+                .build();
+
+        request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyEcrClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isZero();
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
     }
 }
