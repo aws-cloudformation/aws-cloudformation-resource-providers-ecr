@@ -1,6 +1,6 @@
 {
     "CreateInputs": {
-        "RepositoryName": "my-testing-inputs-repository-test",
+        "RepositoryName": "contract-test-inputs-repository",
         "Tags": [
             {
                 "Key": "Env",
@@ -30,7 +30,8 @@
         },
         "LifecyclePolicy": {
             "LifecyclePolicyText": "{\"rules\":[{\"rulePriority\":1,\"description\":\"Keep only one untagged image, expire all others\",\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"imageCountMoreThan\",\"countNumber\":1},\"action\":{\"type\":\"expire\"}}]}"
-        }
+        },
+        "EmptyOnDelete": false
     },
 
     "PatchInputs": [

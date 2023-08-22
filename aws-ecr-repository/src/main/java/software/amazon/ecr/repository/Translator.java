@@ -32,7 +32,7 @@ public class Translator {
     public static final ObjectMapper MAPPER = new ObjectMapper();
 
     static CreateRepositoryRequest createRepositoryRequest(final ResourceModel model,
-                                                           final Map<String, String> tags) {
+            final Map<String, String> tags) {
 
         CreateRepositoryRequest.Builder createRepositoryRequest = CreateRepositoryRequest.builder()
                 .repositoryName(model.getRepositoryName())
@@ -98,9 +98,14 @@ public class Translator {
     }
 
     static DeleteRepositoryRequest deleteRepositoryRequest(final ResourceModel model) {
-        return DeleteRepositoryRequest.builder()
-                .repositoryName(model.getRepositoryName())
-                .build();
+        DeleteRepositoryRequest.Builder requestBuilder = DeleteRepositoryRequest.builder()
+                .repositoryName(model.getRepositoryName());
+
+        if  (model.getEmptyOnDelete() != null) {
+            requestBuilder.force(model.getEmptyOnDelete());
+        }
+
+        return requestBuilder.build();
     }
 
     static TagResourceRequest tagResourceRequest(final List<Tag> tags, final String arn) {
@@ -161,7 +166,7 @@ public class Translator {
     }
 
     static PutImageTagMutabilityRequest putImageTagMutabilityRequest(final ResourceModel model,
-                                                                     final String registryId) {
+            final String registryId) {
         return PutImageTagMutabilityRequest.builder()
                 .registryId(registryId)
                 .repositoryName(model.getRepositoryName())
@@ -170,7 +175,7 @@ public class Translator {
     }
 
     static PutImageScanningConfigurationRequest putImageScanningConfigurationRequest(final ResourceModel model,
-                                                                                     final String registryId) {
+            final String registryId) {
         ImageScanningConfiguration sdkImageScanningConfiguration = ImageScanningConfiguration.builder()
                 .scanOnPush(model.getImageScanningConfiguration().getScanOnPush()).build();
 

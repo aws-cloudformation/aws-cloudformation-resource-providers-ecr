@@ -12,6 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "AWS::ECR::Repository",
     "Properties" : {
+        "<a href="#emptyondelete" title="EmptyOnDelete">EmptyOnDelete</a>" : <i>Boolean</i>,
         "<a href="#lifecyclepolicy" title="LifecyclePolicy">LifecyclePolicy</a>" : <i><a href="lifecyclepolicy.md">LifecyclePolicy</a></i>,
         "<a href="#repositoryname" title="RepositoryName">RepositoryName</a>" : <i>String</i>,
         "<a href="#repositorypolicytext" title="RepositoryPolicyText">RepositoryPolicyText</a>" : <i>Map, String</i>,
@@ -28,6 +29,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: AWS::ECR::Repository
 Properties:
+    <a href="#emptyondelete" title="EmptyOnDelete">EmptyOnDelete</a>: <i>Boolean</i>
     <a href="#lifecyclepolicy" title="LifecyclePolicy">LifecyclePolicy</a>: <i><a href="lifecyclepolicy.md">LifecyclePolicy</a></i>
     <a href="#repositoryname" title="RepositoryName">RepositoryName</a>: <i>String</i>
     <a href="#repositorypolicytext" title="RepositoryPolicyText">RepositoryPolicyText</a>: <i>Map, String</i>
@@ -39,6 +41,16 @@ Properties:
 </pre>
 
 ## Properties
+
+#### EmptyOnDelete
+
+If true, deleting the repository force deletes the contents of the repository. Without a force delete, you can only delete empty repositories.
+
+_Required_: No
+
+_Type_: Boolean
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### LifecyclePolicy
 
